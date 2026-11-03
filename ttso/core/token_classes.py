@@ -45,8 +45,10 @@ class TokenClassManager:
             ids.setdefault(k, len(ids))
         self.class_id = torch.tensor([ids[k] for k in key])
         self.heads = [type_heads(name, encode, self.texts) for name in type_names]
-        clash = set.intersection(*self.heads) if len(self.heads) > 1 else set()
-        assert not clash, f"type names share a first token {clash}"
+        for a in range(self.K):
+            for b in range(a + 1, self.K):
+                clash = self.heads[a] & self.heads[b]
+                assert not clash, f"{type_names[a]} and {type_names[b]} share a first token {clash}"
         head_of = {h: k for k, hs in enumerate(self.heads) for h in hs}
         self.type_of = torch.tensor([-1 if self.special[i] else head_of.get(core(t), -1)
                                      for i, t in enumerate(self.texts)], dtype=torch.long)
@@ -121,8 +123,3 @@ def type_heads(name, encode=None, texts=None):
                     break
     return heads
 
-
-def vocab_texts(tokenizer):
-    """Decoded text of every token id (byte-level BPE pieces decoded on their own)."""
-    n = len(tokenizer)
-    return [tokenizer.decode([i]) for i in range(n)]

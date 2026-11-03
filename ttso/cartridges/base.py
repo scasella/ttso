@@ -74,9 +74,5 @@ class TextAligner:
         return int(np.searchsorted(self.starts, c, side="right") - 1)
 
 
-def token_texts_of(tokens, vocab):
-    return [vocab[int(i)] for i in tokens]
-
-
 def as_list(tokens):
     return [int(x) for x in (tokens.tolist() if torch.is_tensor(tokens) else tokens)]

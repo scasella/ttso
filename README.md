@@ -9,7 +9,7 @@ It runs a compiled, zero-parameter Gated DeltaNet verifier over the completion. 
 3. rewinds the KV cache to that token;
 4. regenerates the suffix, for up to 3 rounds.
 
-This is DiffRepair, from the `diffspec` study in the parent directory, packaged for Apple Silicon. Two backends are included: HuggingFace on `mps`, and llama.cpp with Metal.
+This is DiffRepair, the inference-time method from the DiffSpec / DiffRepair study (November 2026), packaged for Apple Silicon. Two backends are included: HuggingFace on `mps`, and llama.cpp with Metal.
 
 ## Install (M4 Pro, macOS)
 
@@ -68,26 +68,26 @@ Run them with:
 .venv/bin/python -m pytest
 ```
 
-Expect about 7 minutes, most of it Gate 4 (17 tests). Results from 3 November 2026 on an M4 Pro (24 GB), torch 2.15, transformers 5.22.1, llama-cpp-python 0.3.36:
+Expect about 6 minutes for the 19 tests, most of it Gate 4. The first run downloads Qwen3-0.6B and Qwen3-0.6B-Base from the Hugging Face Hub. Results from 3 November 2026 on an M4 Pro (24 GB), torch 2.15, transformers 5.22.1, llama-cpp-python 0.3.36:
 
 | Gate | Result |
 |---|---|
 | 1. Exactness and non-fading memory | 200 random programs (27,857 tokens, 3,906 checks) agree with the string-level reference checker on every token. Both the check verdicts and the full memory state after each token match, in float32 and float16, on cpu and mps. The gradient at the declaration is the same at distances 8 and 256 (ratio 1.000000). Tokens in between receive exactly 0. The custom backward equals autograd through the spec's p_t formula (float64). |
 | 2. Single-edit type direction (K = 5) | 200 / 200 declarations fixed by one gradient-directed edit. Blind, the model's best other type token at the same site, fixed 45 / 200. |
 | 3. Problem 14 | Smart: round 1 changes `+stock: Nat` to `U32`. Round 2 sees `consistent_uses[stock] = 1`, edits the call site (`6n` → `6`) and is valid in 2 rounds. See the notes below for the Upstream comparison. |
-| 4. JSON DAG on M4 Pro | Table below. Peak MPS allocated memory was 1.72 GB. |
+| 4. JSON DAG on M4 Pro | Table below. Peak MPS allocated memory was 1.54 GB with the final code, which keeps only the last position's logits at prefill, and 1.72 GB before that change. |
 | Backends | On both HF/mps and llama.cpp/Metal, rewind + replay reproduces the original continuation exactly. An edited token's continuation matches a fresh decode of the edited prefix (12 / 12 tokens). |
 
 Gate 4: 20 prompts, Qwen3-0.6B-Base, float16 on mps. Every regime starts from the same greedy completion. Best-of-N samples at temperature 0.7, with its tokens matched per problem to the unpinned ttso run.
 
-Two runs are logged, `runs/gate4/20261103-084404` (Gate 4 alone) and `20261103-085145` (the full suite). Their outcomes are identical, because decoding is deterministic. Timings are given as the range across the two runs.
+Three two-regime runs are logged in `runs/gate4/`: `20261103-084404` (Gate 4 alone), `20261103-085145` (full suite) and `20261103-090307` (full suite, final code). Decoding is deterministic, so their outcomes are identical. Timings are given as the range across the three runs.
 
 | | Valid | Correct | Faithful | Extra tokens | Mean s / problem | Max s |
 |---|---|---|---|---|---|---|
 | Greedy | 5 | 5 | 5 | 0 | 3.6–4.1 | |
 | Best-of-N | 6 | 6 | 5 | 2,670 | | |
-| ttso, spec routing | 15 | 11 | 5 | 2,824 | 6.7–7.8 | 12.2–14.7 |
-| ttso, `pin_inputs=True` | 14 | 10 | 9 | 2,352 | 5.9–7.2 | 15.5–18.7 |
+| ttso, spec routing | 15 | 11 | 5 | 2,824 | 6.6–7.8 | 11.6–14.7 |
+| ttso, `pin_inputs=True` | 14 | 10 | 9 | 2,352 | 5.9–7.2 | 15.1–18.7 |
 
 Column definitions:
 
@@ -100,7 +100,7 @@ Paired exact McNemar tests on n = 20:
 - Correct, ttso vs Best-of-N: 6–1 (p = 0.125).
 - Faithful, pinned vs Best-of-N: 4–0 (p = 0.125).
 
-The 8.5 s latency target holds, but only with a modest margin: 6.7–7.8 s across three runs, including an earlier run of the spec-routing regime alone (`20261103-083639`, same outcomes, 7.63 s). A busy machine could push it past the target. Per-problem logs and summaries are in `runs/gate4/<timestamp>/`.
+The 8.5 s latency target holds, but only with a modest margin: 6.6–7.8 s across four runs, including an earlier run of the spec-routing regime alone (`20261103-083639`, same outcomes, 7.63 s). A busy machine could push it past the target. Per-problem logs and summaries are in `runs/gate4/<timestamp>/`.
 
 ## What Gate 4 shows
 

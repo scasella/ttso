@@ -12,7 +12,7 @@ from ttso.backends.base import Backend, pick
 
 
 class LlamaCppBackend(Backend):
-    def __init__(self, model_path, n_ctx=1024, n_gpu_layers=-1, seed=0, verbose=False):
+    def __init__(self, model_path, n_ctx=2048, n_gpu_layers=-1, seed=0, verbose=False):
         from llama_cpp import Llama
         self.llm = Llama(model_path=model_path, n_ctx=n_ctx, n_gpu_layers=n_gpu_layers, logits_all=True,
                          seed=seed, verbose=verbose)

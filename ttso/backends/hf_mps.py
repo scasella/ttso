@@ -21,7 +21,6 @@ class HuggingFaceMPSBackend(Backend):
         self.eos_ids.discard(None)
         self._texts = None
         self._peak = 0
-        self.forward_calls = 0
 
     @property
     def vocab_size(self):
@@ -58,8 +57,7 @@ class HuggingFaceMPSBackend(Backend):
         ids = torch.tensor([list(prefix_ids)], device=self.device)
         out, rows = [], []
         for _ in range(max_new_tokens):
-            o = self.model(input_ids=ids, past_key_values=cache, use_cache=True)
-            self.forward_calls += 1
+            o = self.model(input_ids=ids, past_key_values=cache, use_cache=True, logits_to_keep=1)
             cache = o.past_key_values
             z = o.logits[0, -1, :].detach().float().cpu().clone()  # raw logits, cached as-is
             self._track()
@@ -87,8 +85,3 @@ class HuggingFaceMPSBackend(Backend):
     def cache_len(self, kv_cache):
         return 0 if kv_cache is None else kv_cache.get_seq_length()
 
-    @torch.inference_mode()
-    def score(self, ids):
-        """Teacher-forced logits (len(ids), V) for every position (row i predicts ids[i + 1])."""
-        o = self.model(input_ids=torch.tensor([list(ids)], device=self.device))
-        return o.logits[0].float().cpu()

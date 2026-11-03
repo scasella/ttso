@@ -227,7 +227,7 @@ class TypedJSONDAGCartridge(Cartridge):
         if err is not None:
             lx.hard.append((tok(err[0]), f"json: {err[1]}"))
             return lx
-        slot = lambda name: lx.slots.setdefault(str(name), len(lx.slots) % self.n_slots)
+        slot = lambda name: lx.slots.setdefault(str(name), len(lx.slots))
         ty = lambda s: TYPES.index(s) if isinstance(s, str) and s in TYPES else None
         hard = lambda s, why: lx.hard.append((tok(s.off) if isinstance(s, S) else last, why))
         if not isinstance(obj, dict):
@@ -274,6 +274,9 @@ class TypedJSONDAGCartridge(Cartridge):
                 hard(call["__end__"], "unbound input")
         else:
             hard(None, "no call")
+        if len(lx.slots) > self.n_slots:  # never alias two symbols onto one memory row
+            lx.ops = [o for o in lx.ops if o.slot < self.n_slots]
+            hard(None, f"more than {self.n_slots} ids")
         lx.ops.sort(key=lambda o: o.t)
         return lx
 

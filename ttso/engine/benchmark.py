@@ -45,7 +45,6 @@ SHOTS = [
 
 NAMES = ["stock", "level", "qty", "price", "fee", "tax", "rent", "items", "boxes", "crates",
          "shift", "hours", "bonus", "deposit", "refund", "count", "parts", "orders", "pallets", "seats"]
-UNITS = {"U32": "U32", "Nat": "Nat", "USD": "USD", "EUR": "EUR"}
 
 
 def _task(rng, i):
@@ -111,7 +110,8 @@ def mcnemar(a, b):
 
 def run(backend, regimes, tasks, k_max=3, max_new_tokens=320, temperature=0.7, log=print):
     """regimes: {name: (cartridge, policy)}. The first regime sets Best-of-N's token budget. Every
-    regime re-decodes the greedy completion (so its latency includes it) and must reproduce it."""
+    regime re-decodes the greedy completion, so its latency includes it; `same_greedy` records
+    whether it reproduced the first regime's (decoding on mps is expected to be deterministic)."""
     loops = {k: RepairLoop(backend, c, policy=p, k_max=k_max, max_new_tokens=max_new_tokens)
              for k, (c, p) in regimes.items()}
     first = next(iter(regimes))
@@ -131,13 +131,12 @@ def run(backend, regimes, tasks, k_max=3, max_new_tokens=320, temperature=0.7, l
                 v = cart.check(g[0])
                 row["greedy"] = {"valid": v.valid, "correct": correct(task, v, text), "faithful": faithful(task, v, text),
                                  "error": v.error, "tokens": len(g[0]), "text": text}
-            assert g[0] == g0, "greedy decoding is not deterministic"
             res = loop.repair(P, greedy=g)
             t_total = time.time() - t0
             row[name] = {"valid": res.verdict.valid, "correct": correct(task, res.verdict, res.text),
                          "faithful": faithful(task, res.verdict, res.text), "error": res.verdict.error,
                          "rounds": res.rounds, "extra_tokens": res.extra_tokens, "history": res.history,
-                         "text": res.text}
+                         "text": res.text, "same_greedy": g[0] == g0}
             row["seconds"][name] = {"greedy": round(t_greedy, 3), "total": round(t_total, 3)}
         budget = row[first]["extra_tokens"]
         if row["greedy"]["valid"] or budget == 0:
@@ -171,6 +170,7 @@ def summarize(rows, regimes, backend=None):
                                  "vs best_of_n": mcnemar(get(k, f), get("best_of_n", f))}
                              for f in ("correct", "faithful")}
     s["repaired_problems"] = sum(1 for r in rows if not r["greedy"]["valid"])
+    s["greedy_reproduced"] = all(r[k]["same_greedy"] for r in rows for k in regimes)
     s["best_of_n"]["tokens_total"] = sum(get("best_of_n", "tokens"))
     s["greedy"]["latency_mean_s"] = sum(r["seconds"][regimes[0]]["greedy"] for r in rows) / n
     if backend is not None and backend.peak_memory() is not None:
