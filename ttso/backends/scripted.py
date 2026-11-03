@@ -77,5 +77,8 @@ class ScriptedBackend(Backend):
     def rewind_kv_cache(self, kv_cache, target_seq_len):
         return list(kv_cache[:target_seq_len])
 
+    def fork_cache(self, kv_cache):
+        return list(kv_cache)
+
     def cache_len(self, kv_cache):
         return len(kv_cache or [])

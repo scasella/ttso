@@ -27,13 +27,18 @@ model can rewrite the argument as a conversion (LocalOnly). pin_inputs=False is 
 apply_forward_mask=True adds a forward structural mask (SchemaPrefix): every decoded token, and every
 repair edit, must keep the completion a prefix of the schema. It enforces structure and scope (key
 order, literal forms, fresh / declared ids, complete call bindings), never types, so the type
-errors are still the verifier's to repair.
+errors are still the verifier's to repair. The mask runs on SchemaState, an incremental form of
+SchemaPrefix that advances over each new token's characters, with one state kept per token
+position (SchemaTrail), so a rewind restores the state at t* by lookup. mask_impl="reparse" keeps
+v0.2's acceptor, which re-parses the whole completion on every query (the equivalence gate's
+reference).
 Hard errors (no gradient): malformed JSON or schema, unknown ids or ops, bad literals, unbound or
 unknown call inputs, an out_type given after its args.
 """
 
 import json
 import re
+import time
 
 import torch
 
@@ -406,14 +411,255 @@ def schema_state(text):
     return SchemaPrefix(text).check()
 
 
+# --- incremental acceptor ------------------------------------------------------------------------
+# SchemaPrefix as an explicit machine: _doc flattened into instructions, run one character at a time.
+_WS, _CH, _UNTIL, _LITERAL, _SEP, _CALLSEP, _BRANCH, _JUMP, _END = range(9)
+_ASCII = tuple(chr(i) for i in range(128))
+
+
+def _program():
+    P, at = [], {}
+    emit = P.append
+
+    def key(k):
+        emit((_WS,)), emit((_CH, f'"{k}"', None)), emit((_WS,)), emit((_CH, ":", None)), emit((_WS,))
+
+    def name(allowed, taken=None, act=None):  # _name: '"', then up to the closing quote
+        emit((_CH, '"', None)), emit((_UNTIL, '"', allowed, True, taken, act))
+
+    def word(allowed, act=None):
+        emit((_CH, '"', None)), emit((_UNTIL, '"', allowed, False, None, act))
+
+    emit((_WS,)), emit((_CH, "{", None)), key("inputs"), emit((_CH, "[", None))
+    at["input"] = len(P)
+    emit((_WS,)), emit((_CH, "{", None)), key("id"), name(None, "inputs", "cur")
+    emit((_WS,)), emit((_CH, ",", None)), key("type"), word("types")
+    emit((_WS,)), emit((_CH, "}", "push_input")), emit((_SEP, ",", "]", "input"))
+    emit((_WS,)), emit((_CH, ",", None)), key("nodes"), emit((_CH, "[", None))
+    at["node"] = len(P)
+    emit((_WS,)), emit((_CH, "{", None)), key("id"), name(None, "decls", "cur")
+    for k, allowed in (("op", "ops"), ("out_type", "types")):
+        emit((_WS,)), emit((_CH, ",", None)), key(k), word(allowed)
+    emit((_WS,)), emit((_CH, ",", None)), key("args"), emit((_CH, "[", None))
+    at["arg"] = len(P)
+    emit((_WS,)), emit((_CH, "{", None)), emit((_WS,)), word("argkeys", "argk")
+    emit((_WS,)), emit((_CH, ":", None)), emit((_WS,)), emit((_BRANCH, {"ref": "ref", "lit": "lit", "convert": "convert"}))
+    at["ref"] = len(P)
+    name("declared"), emit((_JUMP, "arg_end"))
+    at["lit"] = len(P)
+    emit((_LITERAL,)), emit((_JUMP, "arg_end"))
+    at["convert"] = len(P)
+    emit((_CH, '"', None)), emit((_UNTIL, "(", "convert", False, None, None))
+    emit((_UNTIL, ")", "declared", True, None, None)), emit((_CH, '"', None))
+    at["arg_end"] = len(P)
+    emit((_WS,)), emit((_CH, "}", None)), emit((_SEP, ",", "]", "arg"))
+    emit((_WS,)), emit((_CH, "}", "push_node")), emit((_SEP, ",", "]", "node"))
+    emit((_WS,)), emit((_CH, ",", None)), key("output"), name("nodes")
+    emit((_WS,)), emit((_CH, ",", None)), key("call"), emit((_CH, "{", None))
+    at["call"] = len(P)
+    emit((_WS,)), name("unbound", None, "bound"), emit((_WS,)), emit((_CH, ":", None)), emit((_WS,))
+    emit((_LITERAL,)), emit((_CALLSEP, "call"))
+    emit((_WS,)), emit((_CH, "}", None)), emit((_END,))
+    resolve = lambda x: at[x] if isinstance(x, str) else x
+    out = []
+    for ins in P:
+        if ins[0] in (_SEP, _CALLSEP, _JUMP):
+            ins = ins[:-1] + (resolve(ins[-1]),)
+        elif ins[0] == _BRANCH:
+            ins = (_BRANCH, {k: at[v] for k, v in ins[1].items()})
+        out.append(ins)
+    return tuple(out)
+
+
+_PROG = _program()
+_FIXED = {"types": TYPES, "ops": OPS, "argkeys": ARG_KEYS, "convert": tuple(CONVERT)}
+
+
+class SchemaState:
+    """The forward mask's parse state after a prefix: the same acceptor as SchemaPrefix, but resumable.
+
+    advance(text) reads only the new characters and returns the state after them, or None once the
+    text has left the schema (SchemaPrefix's "bad"). States are immutable, so one per token position
+    can be kept and a rewind is a lookup. next_chars() is the cached set of ASCII characters the
+    schema allows next.
+    """
+
+    __slots__ = ("pc", "k", "buf", "inputs", "nodes", "bound", "cur", "argk", "_next")
+
+    def __init__(self, pc=0, k=0, buf="", inputs=(), nodes=(), bound=(), cur=None, argk=None):
+        self.pc, self.k, self.buf = pc, k, buf
+        self.inputs, self.nodes, self.bound, self.cur, self.argk = inputs, nodes, bound, cur, argk
+        self._next = None
+
+    @property
+    def done(self):
+        return _PROG[self.pc][0] == _END
+
+    @property
+    def status(self):
+        return "done" if self.done else "more"
+
+    def _copy(self):
+        return SchemaState(self.pc, self.k, self.buf, self.inputs, self.nodes, self.bound, self.cur, self.argk)
+
+    def advance(self, text):
+        if not text:
+            return self
+        s = self._copy()
+        for c in text:
+            if not s._step(c):
+                return None
+        return s
+
+    def next_chars(self):
+        if self._next is None:
+            self._next = frozenset(c for c in _ASCII if self._copy()._step(c))
+        return self._next
+
+    def _src(self, name):
+        if name in _FIXED:
+            return _FIXED[name]
+        if name == "inputs":
+            return self.inputs
+        if name in ("decls", "declared"):
+            return self.inputs + self.nodes
+        if name == "nodes":
+            return self.nodes
+        return tuple(a for a in self.inputs if a not in self.bound)  # "unbound"
+
+    def _act(self, act, part=None):
+        if act == "cur":
+            self.cur = part
+        elif act == "argk":
+            self.argk = part
+        elif act == "bound":
+            self.bound = self.bound + (part,)
+        elif act == "push_input":
+            self.inputs, self.cur = self.inputs + (self.cur,), None
+        elif act == "push_node":
+            self.nodes, self.cur = self.nodes + (self.cur,), None
+
+    def _enter(self):
+        """SchemaPrefix._until fails on an empty allowed set even before its first character."""
+        ins = _PROG[self.pc]
+        return not (ins[0] == _UNTIL and ins[2] is not None and not self._src(ins[2]))
+
+    def _done_with(self, pc):
+        self.k, self.buf, self.pc = 0, "", pc
+        return self._enter()
+
+    def _step(self, c):
+        while True:
+            ins = _PROG[self.pc]
+            op = ins[0]
+            if op == _WS:
+                if c == " " or c == "\n":
+                    return True
+                self.pc += 1
+            elif op == _CH:
+                w = ins[1]
+                if c != w[self.k]:
+                    return False
+                self.k += 1
+                if self.k < len(w):
+                    return True
+                self._act(ins[2])
+                return self._done_with(self.pc + 1)
+            elif op == _UNTIL:
+                _, stop, allowed, charset, taken, act = ins
+                allowed = None if allowed is None else self._src(allowed)
+                if c == stop:
+                    part = self.buf
+                    if not part or (allowed is not None and part not in allowed) or (taken and part in self._src(taken)):
+                        return False
+                    self._act(act, part)
+                    return self._done_with(self.pc + 1)
+                if charset and c not in (NAME_CHARS if self.buf else NAME_HEAD):
+                    return False
+                self.buf += c
+                return allowed is None or any(a.startswith(self.buf) for a in allowed)
+            elif op == _LITERAL:
+                return self._literal(c)
+            elif op == _SEP:
+                if c == " " or c == "\n":
+                    return True
+                if c == ins[1]:
+                    return self._done_with(ins[3])
+                return c == ins[2] and self._done_with(self.pc + 1)
+            elif op == _CALLSEP:
+                if c == " " or c == "\n":
+                    return True
+                if c == "," and len(self.bound) < len(self.inputs):
+                    return self._done_with(ins[1])
+                return c == "}" and len(self.bound) == len(self.inputs) and self._done_with(self.pc + 1)
+            elif op == _BRANCH:
+                self.pc = ins[1][self.argk]
+            elif op == _JUMP:
+                self.pc = ins[1]
+            else:  # _END: SchemaPrefix.check strips trailing whitespace
+                return c.isspace()
+
+    def _literal(self, c):
+        # k: 0 opening quote, 1 no digit yet, 2 digits, 3 after ".", 4 fraction digits, 5 rest of a suffix (buf)
+        k = self.k
+        if k == 0:
+            self.k = 1
+            return c == '"'
+        if k in (1, 3):
+            self.k += 1
+            return c.isdigit()
+        if k in (2, 4) and c.isdigit():
+            return True
+        if c == '"' and k in (2, 4):
+            return self._done_with(self.pc + 1)
+        if k == 2 and c in "n.ue":
+            self.k, self.buf = (3, "") if c == "." else (5, {"n": '"', "u": 'sd"', "e": 'ur"'}[c])
+            return True
+        if k == 5 and c == self.buf[0]:
+            self.buf = self.buf[1:]
+            return bool(self.buf) or self._done_with(self.pc + 1)
+        return False
+
+
+class SchemaTrail:
+    """SchemaState per token position of the trajectory last queried: states[i] is the state after
+    the first i tokens (None once a token left the schema). A query for a prefix of that trajectory
+    is a lookup (a rewind to t* reads states[t*]); one that extends it advances over the new tokens'
+    characters only. The id comparison that finds the shared prefix is a C-level list compare."""
+
+    def __init__(self, texts):
+        self.texts = texts
+        self.ids, self.states = [], [SchemaState()]
+
+    def state(self, tokens):
+        tokens = tokens if type(tokens) is list else as_list(tokens)
+        n, ids = len(tokens), self.ids
+        if n <= len(ids) and ids[:n] == tokens:
+            return self.states[n]
+        k = min(n, len(ids))
+        if ids[:k] != tokens[:k]:
+            k = next(j for j in range(k) if ids[j] != tokens[j])
+        del ids[k:], self.states[k + 1:]
+        for v in tokens[k:]:
+            s = self.states[-1]
+            self.states.append(None if s is None else s.advance(self.texts[v]))
+            ids.append(v)
+        return self.states[n]
+
+
 class TypedJSONDAGCartridge(Cartridge):
     type_names = list(TYPES)
 
     def __init__(self, token_texts, encode=None, special_ids=(), n_slots=64, pin_inputs=True,
-                 apply_forward_mask=False):
+                 apply_forward_mask=False, mask_impl="incremental"):
+        assert mask_impl in ("incremental", "reparse"), mask_impl
         self.texts = token_texts
         self.pin_inputs = pin_inputs  # input types are the prompt's contract: never edit them
         self.apply_forward_mask = apply_forward_mask  # decode inside the schema (SchemaPrefix)
+        self.mask_impl = mask_impl  # "reparse": the v0.2 acceptor, re-parsing the completion each query
+        self._trail = SchemaTrail(token_texts)
+        self._cand_cache = {}
+        self.mask_seconds, self.mask_calls = 0.0, 0  # time spent in accept() / candidates()
         self._special = set(special_ids)
         self._first = None
         self.n_slots = n_slots
@@ -438,28 +684,47 @@ class TypedJSONDAGCartridge(Cartridge):
     def candidates(self, tokens):
         """A cheap superset of the tokens `accept` admits: those whose first character the schema
         allows next (every admitted token starts with one), plus EOS once the document is done."""
+        t0 = time.perf_counter()
         if self._first is None:
             self._first = {}
             for i, t in enumerate(self.texts):
                 if t and i not in self._special:
                     self._first.setdefault(t[0], []).append(i)
             self._first = {c: torch.tensor(ids) for c, ids in self._first.items()}
-        head = self.text(tokens)
-        m = torch.zeros(len(self.texts), dtype=torch.bool)
-        for c, ids in self._first.items():
-            if c.isascii() and schema_state(head + c) != "bad":
-                m[ids] = True
-        if schema_state(head) == "done":
-            m[list(self._special)] = True
-        return m
+        if self.mask_impl == "reparse":
+            head = self.text(tokens)
+            chars = frozenset(c for c in self._first if c.isascii() and schema_state(head + c) != "bad")
+            done = schema_state(head) == "done"
+        else:
+            s = self._trail.state(tokens)
+            chars = frozenset() if s is None else frozenset(s.next_chars() & self._first.keys())
+            done = s is not None and s.done
+        if (chars, done) not in self._cand_cache:
+            m = torch.zeros(len(self.texts), dtype=torch.bool)
+            for c in chars:
+                m[self._first[c]] = True
+            if done:
+                m[list(self._special)] = True
+            self._cand_cache[chars, done] = m
+        self.mask_seconds += time.perf_counter() - t0
+        self.mask_calls += 1
+        return self._cand_cache[chars, done].clone()
 
     def accept(self, tokens, cand):
         """Forward structural mask: may token `cand` follow completion `tokens`? (EOS only once the
         document is complete; other special tokens never.)"""
-        head = self.text(tokens)
-        if int(cand) in self._special:
-            return schema_state(head) == "done"
-        return schema_state(head + self.texts[int(cand)]) != "bad"
+        t0 = time.perf_counter()
+        cand = int(cand)
+        if self.mask_impl == "reparse":
+            head = self.text(tokens)
+            ok = (schema_state(head) == "done" if cand in self._special
+                  else schema_state(head + self.texts[cand]) != "bad")
+        else:
+            s = self._trail.state(tokens)
+            ok = s is not None and (s.done if cand in self._special else s.advance(self.texts[cand]) is not None)
+        self.mask_seconds += time.perf_counter() - t0
+        self.mask_calls += 1
+        return ok
 
     def logits_processor(self, tokens, z):
         """Schema-level constrained decoding: a type slot admits only the five type names."""

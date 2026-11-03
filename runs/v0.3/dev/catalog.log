@@ -1,0 +1,100 @@
+W1103 12:31:26.522000 20806 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]Loading weights:   0%|          | 1/320 [00:00<04:07,  1.29it/s]Loading weights: 100%|██████████| 320/320 [00:00<00:00, 410.80it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[ 0] greedy x | local x r=3 +90 | upstream x r=3 +149 | smart x r=3 +149 | smart_pinned x r=3 +90 | best_of_n x
+[ 1] greedy x | local F r=1 +32 | upstream C r=2 +41 | smart C r=2 +41 | smart_pinned F r=1 +32 | best_of_n x
+[ 2] greedy x | local v r=2 +33 | upstream x r=3 +155 | smart C r=3 +69 | smart_pinned v r=2 +33 | best_of_n x
+[ 3] greedy x | local F r=1 +45 | upstream C r=1 +51 | smart C r=1 +51 | smart_pinned F r=1 +45 | best_of_n x
+[ 4] greedy x | local F r=2 +65 | upstream C r=2 +43 | smart C r=2 +43 | smart_pinned F r=2 +65 | best_of_n x
+[ 5] greedy x | local F r=2 +47 | upstream C r=1 +59 | smart C r=1 +59 | smart_pinned F r=2 +47 | best_of_n x
+[ 6] greedy x | local x r=3 +49 | upstream x r=3 +95 | smart x r=3 +95 | smart_pinned x r=3 +49 | best_of_n x
+[ 7] greedy x | local x r=3 +101 | upstream C r=1 +73 | smart C r=1 +73 | smart_pinned x r=3 +101 | best_of_n x
+[ 8] greedy x | local F r=1 +32 | upstream C r=2 +41 | smart C r=2 +41 | smart_pinned F r=1 +32 | best_of_n x
+[ 9] greedy x | local v r=1 +35 | upstream x r=3 +61 | smart x r=3 +61 | smart_pinned v r=1 +35 | best_of_n x
+[10] greedy x | local F r=1 +33 | upstream C r=2 +41 | smart C r=2 +41 | smart_pinned F r=1 +33 | best_of_n x
+[11] greedy x | local x r=3 +227 | upstream x r=3 +227 | smart x r=3 +227 | smart_pinned x r=3 +227 | best_of_n x
+[12] greedy x | local F r=2 +102 | upstream x r=3 +213 | smart x r=3 +213 | smart_pinned F r=2 +102 | best_of_n x
+[13] greedy x | local x r=3 +64 | upstream x r=3 +113 | smart x r=3 +113 | smart_pinned x r=3 +64 | best_of_n x
+[14] greedy x | local x r=3 +47 | upstream C r=3 +87 | smart C r=3 +87 | smart_pinned x r=3 +47 | best_of_n x
+[15] greedy x | local F r=1 +33 | upstream C r=2 +41 | smart C r=2 +41 | smart_pinned F r=1 +33 | best_of_n x
+[16] greedy x | local x r=3 +117 | upstream C r=3 +157 | smart C r=3 +157 | smart_pinned x r=3 +117 | best_of_n x
+[17] greedy x | local v r=1 +34 | upstream v r=2 +41 | smart v r=2 +41 | smart_pinned v r=1 +34 | best_of_n x
+[18] greedy x | local F r=2 +42 | upstream C r=3 +49 | smart C r=3 +49 | smart_pinned F r=2 +42 | best_of_n x
+[19] greedy x | local x r=3 +104 | upstream x r=3 +157 | smart x r=3 +157 | smart_pinned x r=3 +104 | best_of_n x
+{
+ "greedy": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0
+ },
+ "best_of_n": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0
+ },
+ "local": {
+  "valid": 12,
+  "correct": 9,
+  "faithful": 9
+ },
+ "upstream": {
+  "valid": 12,
+  "correct": 11,
+  "faithful": 0
+ },
+ "smart": {
+  "valid": 13,
+  "correct": 12,
+  "faithful": 0
+ },
+ "smart_pinned": {
+  "valid": 12,
+  "correct": 9,
+  "faithful": 9
+ }
+}
+{
+ "C1": {
+  "only_first": 12,
+  "only_second": 0,
+  "p": 0.00048828125,
+  "pair": [
+   "smart",
+   "best_of_n"
+  ],
+  "p_holm": 0.001953125
+ },
+ "C2": {
+  "only_first": 9,
+  "only_second": 0,
+  "p": 0.00390625,
+  "pair": [
+   "smart_pinned",
+   "best_of_n"
+  ],
+  "p_holm": 0.0078125
+ },
+ "C3": {
+  "only_first": 9,
+  "only_second": 0,
+  "p": 0.00390625,
+  "pair": [
+   "local",
+   "best_of_n"
+  ],
+  "p_holm": 0.0078125
+ },
+ "C4": {
+  "only_first": 11,
+  "only_second": 0,
+  "p": 0.0009765625,
+  "pair": [
+   "upstream",
+   "best_of_n"
+  ],
+  "p_holm": 0.0029296875
+ }
+}

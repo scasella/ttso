@@ -1,0 +1,8 @@
+{'suite': 'catalog', 'i': 0, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'catalog', 'i': 1, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'catalog', 'i': 2, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'catalog', 'i': 3, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'json', 'i': 0, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'json', 'i': 1, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'json', 'i': 2, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}
+{'suite': 'json', 'i': 3, 'greedy_same': True, 'fork_same': True, 'fresh_same': True}

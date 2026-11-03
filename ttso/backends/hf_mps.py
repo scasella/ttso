@@ -9,6 +9,8 @@ attention layers to c and re-feeds the tokens c..n-1 one at a time, the same sin
 that produced them.
 """
 
+import copy
+
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
 from transformers.cache_utils import DynamicLayer, LinearAttentionCacheLayerMixin
@@ -33,6 +35,7 @@ class HuggingFaceMPSBackend(Backend):
         self.hybrid = "linear_attention" in (getattr(text_cfg, "layer_types", None) or [])
         self.ckpt_every = ckpt_every
         self.ckpt_bytes_peak = 0
+        self.rewinds, self.replayed = 0, 0  # rewind_kv_cache calls, tokens re-fed after a checkpoint restore
         self._texts = None
         self._peak = 0
 
@@ -131,6 +134,7 @@ class HuggingFaceMPSBackend(Backend):
         cur = kv_cache.get_seq_length()
         if target_seq_len > cur:
             raise ValueError(f"cannot rewind forward: cache holds {cur} positions, asked for {target_seq_len}")
+        self.rewinds += 1
         if target_seq_len == cur:
             return kv_cache
         if not self.hybrid:
@@ -145,12 +149,17 @@ class HuggingFaceMPSBackend(Backend):
                 if isinstance(layer, DynamicLayer) and DynamicLayer.get_seq_length(layer) > c:
                     DynamicLayer.crop(layer, c - DynamicLayer.get_seq_length(layer))
             replay = kv_cache._ttso_ids[c:target_seq_len]
+            self.replayed += len(replay)
             kv_cache._ttso_ids = kv_cache._ttso_ids[:c]
             kv_cache._ttso_ck = {p: s for p, s in kv_cache._ttso_ck.items() if p <= c}
             for y in replay:
                 _, kv_cache = self._forward(kv_cache, [y])
         assert kv_cache.get_seq_length() == target_seq_len
         return kv_cache
+
+    @torch.inference_mode()
+    def fork_cache(self, kv_cache):
+        return copy.deepcopy(kv_cache)  # includes the hybrid checkpoints (_ttso_ck, _ttso_ids)
 
     def cache_len(self, kv_cache):
         return 0 if kv_cache is None else kv_cache.get_seq_length()

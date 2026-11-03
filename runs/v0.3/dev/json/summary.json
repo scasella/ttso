@@ -1,0 +1,112 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy",
+  "greedy_masked",
+  "best_of_n",
+  "best_of_n_masked",
+  "ttso_pinned",
+  "ttso_pinned_masked",
+  "ttso_unpinned"
+ ],
+ "greedy": {
+  "valid": 3,
+  "correct": 2,
+  "faithful": 2,
+  "faithful_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "latency_mean_s": 4.505
+ },
+ "greedy_masked": {
+  "valid": 5,
+  "correct": 2,
+  "faithful": 2,
+  "faithful_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "latency_mean_s": 4.4086
+ },
+ "best_of_n": {
+  "valid": 3,
+  "correct": 2,
+  "faithful": 2,
+  "faithful_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "tokens_total": 3499
+ },
+ "best_of_n_masked": {
+  "valid": 5,
+  "correct": 2,
+  "faithful": 2,
+  "faithful_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "tokens_total": 3323
+ },
+ "ttso_pinned": {
+  "valid": 8,
+  "correct": 6,
+  "faithful": 6,
+  "faithful_wilson95": [
+   0.1455,
+   0.519
+  ],
+  "extra_tokens_total": 3499,
+  "latency_mean_s": 9.804649999999999,
+  "latency_max_s": 16.567,
+  "same_greedy": true,
+  "rewinds": 44,
+  "replayed_tokens": 379,
+  "replayed_per_rewind": 8.613636363636363
+ },
+ "ttso_pinned_masked": {
+  "valid": 9,
+  "correct": 5,
+  "faithful": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "extra_tokens_total": 3323,
+  "latency_mean_s": 9.30105,
+  "latency_max_s": 16.134,
+  "same_greedy": true,
+  "rewinds": 39,
+  "replayed_tokens": 347,
+  "replayed_per_rewind": 8.897435897435898
+ },
+ "ttso_unpinned": {
+  "valid": 16,
+  "correct": 6,
+  "faithful": 4,
+  "faithful_wilson95": [
+   0.0807,
+   0.416
+  ],
+  "extra_tokens_total": 3584,
+  "latency_mean_s": 9.8185,
+  "latency_max_s": 15.605,
+  "same_greedy": true,
+  "rewinds": 43,
+  "replayed_tokens": 286,
+  "replayed_per_rewind": 6.651162790697675
+ },
+ "peak_mps_allocated_gb": 2.904108032,
+ "ckpt_peak_mib": 376.875,
+ "model": "Qwen/Qwen3.5-0.8B",
+ "dtype": "float16",
+ "split": "dev",
+ "n_tasks": 20,
+ "wall_s": 710.9,
+ "max_new_tokens": 320,
+ "k_max": 3,
+ "torch": "2.15.0",
+ "mps": true,
+ "revision": "2fc06364715b967f1860aea9cf38778875588b17"
+}

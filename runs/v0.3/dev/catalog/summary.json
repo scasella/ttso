@@ -1,0 +1,107 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy",
+  "best_of_n",
+  "local",
+  "upstream",
+  "smart",
+  "smart_pinned"
+ ],
+ "greedy": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "latency_mean_s": 2.3587499999999997
+ },
+ "best_of_n": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "tokens_total": 1894
+ },
+ "local": {
+  "valid": 12,
+  "correct": 9,
+  "faithful": 9,
+  "faithful_wilson95": [
+   0.2582,
+   0.6579
+  ],
+  "extra_tokens_total": 1332,
+  "latency_mean_s": 5.3635,
+  "latency_max_s": 9.522,
+  "same_greedy": true,
+  "rewinds": 41,
+  "replayed_tokens": 349,
+  "replayed_per_rewind": 8.512195121951219
+ },
+ "upstream": {
+  "valid": 12,
+  "correct": 11,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "extra_tokens_total": 1894,
+  "latency_mean_s": 6.01135,
+  "latency_max_s": 10.988,
+  "same_greedy": true,
+  "rewinds": 48,
+  "replayed_tokens": 286,
+  "replayed_per_rewind": 5.958333333333333
+ },
+ "smart": {
+  "valid": 13,
+  "correct": 12,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "extra_tokens_total": 1808,
+  "latency_mean_s": 6.0124,
+  "latency_max_s": 11.362,
+  "same_greedy": true,
+  "rewinds": 48,
+  "replayed_tokens": 287,
+  "replayed_per_rewind": 5.979166666666667
+ },
+ "smart_pinned": {
+  "valid": 12,
+  "correct": 9,
+  "faithful": 9,
+  "faithful_wilson95": [
+   0.2582,
+   0.6579
+  ],
+  "extra_tokens_total": 1332,
+  "latency_mean_s": 5.2274,
+  "latency_max_s": 9.001,
+  "same_greedy": true,
+  "rewinds": 41,
+  "replayed_tokens": 349,
+  "replayed_per_rewind": 8.512195121951219
+ },
+ "peak_mps_allocated_gb": 2.141600768,
+ "ckpt_peak_mib": 150.75,
+ "model": "Qwen/Qwen3.5-0.8B",
+ "dtype": "float16",
+ "split": "dev",
+ "n_tasks": 20,
+ "wall_s": 390.1,
+ "max_new_tokens": 256,
+ "k_max": 3,
+ "torch": "2.15.0",
+ "mps": true,
+ "revision": "2fc06364715b967f1860aea9cf38778875588b17"
+}

@@ -1,0 +1,105 @@
+W1103 12:38:07.176000 22837 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]Loading weights:   0%|          | 1/320 [00:00<04:51,  1.09it/s]Loading weights: 100%|██████████| 320/320 [00:00<00:00, 348.51it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[ 0] greedy x | greedy_masked x | ttso_pinned x r=3 +119 | ttso_pinned_masked v r=2 +94 | ttso_unpinned v r=3 +154 | best_of_n x | best_of_n_masked x
+[ 1] greedy x | greedy_masked x | ttso_pinned x r=3 +289 | ttso_pinned_masked x r=3 +303 | ttso_unpinned x r=3 +297 | best_of_n x | best_of_n_masked x
+[ 2] greedy x | greedy_masked v | ttso_pinned F r=1 +72 | ttso_pinned_masked v r=0 +0 | ttso_unpinned F r=1 +72 | best_of_n x | best_of_n_masked v
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +273 | ttso_pinned_masked x r=3 +267 | ttso_unpinned v r=2 +158 | best_of_n x | best_of_n_masked x
+[ 4] greedy x | greedy_masked x | ttso_pinned F r=1 +57 | ttso_pinned_masked F r=1 +57 | ttso_unpinned v r=3 +157 | best_of_n x | best_of_n_masked x
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +261 | ttso_pinned_masked x r=3 +260 | ttso_unpinned x r=3 +351 | best_of_n x | best_of_n_masked x
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 7] greedy x | greedy_masked x | ttso_pinned x r=3 +261 | ttso_pinned_masked x r=3 +298 | ttso_unpinned v r=3 +229 | best_of_n x | best_of_n_masked x
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +201 | ttso_pinned_masked x r=3 +201 | ttso_unpinned v r=3 +154 | best_of_n x | best_of_n_masked x
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +269 | ttso_pinned_masked x r=3 +269 | ttso_unpinned v r=3 +361 | best_of_n x | best_of_n_masked x
+[10] greedy v | greedy_masked v | ttso_pinned v r=0 +0 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=0 +0 | best_of_n v | best_of_n_masked v
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +369 | ttso_pinned_masked x r=3 +366 | ttso_unpinned v r=2 +153 | best_of_n x | best_of_n_masked x
+[12] greedy x | greedy_masked x | ttso_pinned v r=3 +81 | ttso_pinned_masked F r=2 +67 | ttso_unpinned C r=1 +110 | best_of_n x | best_of_n_masked x
+[13] greedy x | greedy_masked x | ttso_pinned x r=3 +218 | ttso_pinned_masked x r=3 +219 | ttso_unpinned v r=3 +300 | best_of_n x | best_of_n_masked x
+[14] greedy x | greedy_masked v | ttso_pinned F r=1 +76 | ttso_pinned_masked v r=0 +0 | ttso_unpinned F r=1 +76 | best_of_n x | best_of_n_masked v
+[15] greedy x | greedy_masked x | ttso_pinned x r=3 +269 | ttso_pinned_masked x r=3 +265 | ttso_unpinned C r=3 +171 | best_of_n x | best_of_n_masked x
+[16] greedy x | greedy_masked x | ttso_pinned F r=2 +129 | ttso_pinned_masked F r=1 +86 | ttso_unpinned x r=3 +209 | best_of_n x | best_of_n_masked x
+[17] greedy x | greedy_masked x | ttso_pinned x r=3 +239 | ttso_pinned_masked x r=3 +257 | ttso_unpinned v r=3 +302 | best_of_n x | best_of_n_masked x
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[19] greedy x | greedy_masked x | ttso_pinned x r=3 +316 | ttso_pinned_masked x r=3 +314 | ttso_unpinned x r=3 +330 | best_of_n x | best_of_n_masked x
+{
+ "greedy": {
+  "valid": 3,
+  "correct": 2,
+  "faithful": 2
+ },
+ "greedy_masked": {
+  "valid": 5,
+  "correct": 2,
+  "faithful": 2
+ },
+ "best_of_n": {
+  "valid": 3,
+  "correct": 2,
+  "faithful": 2
+ },
+ "best_of_n_masked": {
+  "valid": 5,
+  "correct": 2,
+  "faithful": 2
+ },
+ "ttso_pinned": {
+  "valid": 8,
+  "correct": 6,
+  "faithful": 6
+ },
+ "ttso_pinned_masked": {
+  "valid": 9,
+  "correct": 5,
+  "faithful": 5
+ },
+ "ttso_unpinned": {
+  "valid": 16,
+  "correct": 6,
+  "faithful": 4
+ }
+}
+{
+ "H1": {
+  "only_first": 4,
+  "only_second": 0,
+  "p": 0.125,
+  "pair": [
+   "ttso_pinned",
+   "greedy"
+  ],
+  "p_holm": 0.5
+ },
+ "H2": {
+  "only_first": 4,
+  "only_second": 0,
+  "p": 0.125,
+  "pair": [
+   "ttso_pinned",
+   "best_of_n"
+  ],
+  "p_holm": 0.5
+ },
+ "H3": {
+  "only_first": 3,
+  "only_second": 0,
+  "p": 0.25,
+  "pair": [
+   "ttso_pinned_masked",
+   "greedy_masked"
+  ],
+  "p_holm": 0.5
+ },
+ "H4": {
+  "only_first": 3,
+  "only_second": 0,
+  "p": 0.25,
+  "pair": [
+   "ttso_pinned_masked",
+   "best_of_n_masked"
+  ],
+  "p_holm": 0.5
+ }
+}

@@ -17,6 +17,11 @@ Ops (slots are (function, name) pairs; `__ret__` is a function's declared return
 A literal's type is read from the token right after its digits: one starting with `n` is Nat, any
 other is U32. Hard errors (no gradient): parse failures, unknown names, arity, a `+` group not
 annotated U32 (BendLite's operators are typed U32), from_nat inside a non-U32 group.
+
+pin_inputs=False (the default) is the study's setup: every declaration, parameter types included,
+is editable. pin_inputs=True freezes the parameter types of every non-main def (the catalog states
+each item's type); a failed group operand or from_nat argument then falls back to a local rewrite
+of that operand (Case C at the operand's first token), so the model can write a conversion instead.
 """
 
 import re
@@ -110,7 +115,7 @@ def _parse_operand(s, off):
         return {"kind": "var", "name": s, "off": off}
     m = re.fullmatch(rf"U32\.from_nat\(\s*({NAME})\s*\)", s)
     if m:
-        return {"kind": "from_nat", "name": m.group(1), "off": off + m.start(1)}
+        return {"kind": "from_nat", "name": m.group(1), "off": off + m.start(1), "start": off}
     m = LIT.fullmatch(s)
     if m:
         return {"kind": "lit", "value": int(m.group(1)), "type": NAT if m.group(2) else U32,
@@ -141,9 +146,10 @@ def _lit_rule(text):
 class BendLiteCatalogCartridge(Cartridge):
     type_names = list(TYPES)
 
-    def __init__(self, token_texts, encode=None, special_ids=(), n_slots=64):
+    def __init__(self, token_texts, encode=None, special_ids=(), n_slots=64, pin_inputs=False):
         self.texts = token_texts
         self.n_slots = n_slots
+        self.pin_inputs = pin_inputs
         self._tcm = TokenClassManager(token_texts, TYPES, lit_rule=_lit_rule, lit_default=U32,
                                       special_ids=special_ids, encode=encode)
         self._lit_ok = torch.tensor([bool(t) and SUFFIX_OK.fullmatch(t) is not None for t in token_texts])
@@ -169,6 +175,8 @@ class BendLiteCatalogCartridge(Cartridge):
                 t = al.tok(o)
                 lx.ops.append(Op(t, DECLARE, slot(f.name, p), tag="param"))
                 lx.sites[t] = "decl"
+                if self.pin_inputs and f.name != "main":
+                    lx.frozen.add(t)
                 if ty(T) is None:
                     lx.hard.append((t, f"bad type {T!r}"))
             t = al.tok(f.ret[1])
@@ -203,6 +211,8 @@ class BendLiteCatalogCartridge(Cartridge):
                     want = T if o["kind"] == "var" else NAT
                     lx.ops.append(Op(al.tok(o["off"]), CHECK_VAR, slot(f.name, o["name"]), want,
                                      tag="group operand" if o["kind"] == "var" else "from_nat arg"))
+                    if o["kind"] == "from_nat" and self.pin_inputs:
+                        lx.local[al.tok(o["off"])] = al.tok(o["start"])
                     if o["kind"] == "from_nat" and T != U32:
                         lx.hard.append((al.tok(o["off"]), "from_nat yields U32"))
                 elif o["type"] != T:

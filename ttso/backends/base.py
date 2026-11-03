@@ -53,6 +53,10 @@ class Backend(ABC):
         """Peak accelerator memory in bytes seen so far (None when not tracked)."""
         return None
 
+    def fork_cache(self, kv_cache):
+        """An independent copy of kv_cache, so one greedy decode can seed several repair runs."""
+        raise NotImplementedError(f"{type(self).__name__} cannot copy its KV cache")
+
 
 def bind(accept, out):
     """accept(new_ids, v) -> a one-argument filter over the current `out`, keeping `candidates`."""

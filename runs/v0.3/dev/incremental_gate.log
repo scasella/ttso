@@ -1,0 +1,48 @@
+W1103 12:53:03.412000 27608 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/310 [00:00<02:23,  2.16it/s]
+Loading weights:  86%|████████▌ | 267/310 [00:00<00:00, 622.35it/s]
+Loading weights: 100%|██████████| 310/310 [00:00<00:00, 493.98it/s]
+[ 0] greedy x | greedy_masked x | ttso_pinned v r=2 +87 | ttso_pinned_masked v r=2 +87 | ttso_unpinned x r=3 +309 | best_of_n x | best_of_n_masked x
+[ 1] greedy x | greedy_masked v | ttso_pinned x r=3 +273 | ttso_pinned_masked v r=0 +0 | ttso_unpinned x r=3 +273 | best_of_n x | best_of_n_masked v
+[ 2] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +134 | ttso_pinned_masked F r=3 +119 | ttso_unpinned C r=3 +176 | best_of_n x | best_of_n_masked x
+[ 4] greedy x | greedy_masked x | ttso_pinned v r=2 +22 | ttso_pinned_masked F r=1 +9 | ttso_unpinned v r=2 +22 | best_of_n x | best_of_n_masked x
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +242 | ttso_pinned_masked x r=3 +242 | ttso_unpinned x r=3 +280 | best_of_n x | best_of_n_masked x
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 7] greedy x | greedy_masked x | ttso_pinned F r=3 +176 | ttso_pinned_masked F r=3 +172 | ttso_unpinned C r=3 +175 | best_of_n x | best_of_n_masked x
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +559 | ttso_pinned_masked v r=2 +113 | ttso_unpinned v r=3 +221 | best_of_n x | best_of_n_masked x
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +209 | ttso_pinned_masked x r=3 +209 | ttso_unpinned x r=3 +287 | best_of_n x | best_of_n_masked x
+[10] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +236 | ttso_pinned_masked x r=3 +238 | ttso_unpinned C r=3 +264 | best_of_n x | best_of_n_masked x
+[12] greedy x | greedy_masked x | ttso_pinned F r=2 +87 | ttso_pinned_masked F r=2 +87 | ttso_unpinned C r=1 +107 | best_of_n x | best_of_n_masked x
+[13] greedy x | greedy_masked v | ttso_pinned v r=1 +10 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=1 +10 | best_of_n x | best_of_n_masked v
+[14] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[15] greedy x | greedy_masked x | ttso_pinned F r=3 +116 | ttso_pinned_masked F r=3 +116 | ttso_unpinned x r=3 +275 | best_of_n x | best_of_n_masked x
+[16] greedy x | greedy_masked x | ttso_pinned C r=1 +48 | ttso_pinned_masked C r=1 +48 | ttso_unpinned C r=2 +231 | best_of_n x | best_of_n_masked x
+[17] greedy x | greedy_masked v | ttso_pinned v r=2 +11 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=2 +11 | best_of_n x | best_of_n_masked v
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[19] greedy x | greedy_masked x | ttso_pinned F r=3 +142 | ttso_pinned_masked F r=3 +123 | ttso_unpinned C r=3 +183 | best_of_n x | best_of_n_masked x
+
+[incremental] 20 seed-0 tasks, masked greedy / masked ttso repair / masked Best-of-N: 20/20 token-for-token identical (reparse vs incremental)
+                                       reparse incremental speedup
+  mask s/problem, greedy                 0.014       0.003    5.1x
+  mask s/problem, greedy + repair        0.035       0.010    3.5x
+  mask s/problem, Best-of-N              0.007       0.002    4.3x
+  latency s/problem, greedy               3.14        3.46   0.91x
+  latency s/problem, greedy + repair      4.74        5.32   0.89x
+  CPU replay over the 20 repaired completions (2939 tokens): accept() 55 vs 6 us/token (9.3x), candidates() 2.84 vs 0.23 ms/token (12.4x)
+.
+[gate4] Qwen/Qwen3-0.6B-Base on mps/fp16, 20 prompts -> runs/gate4/20261103-130049
+                       valid correct faithful  faithful 95% CI extra tok mean s
+  greedy                   5       5        5        0.11-0.47         0   3.47
+  greedy_masked            8       5        5        0.11-0.47         0   3.46
+  best_of_n                5       5        5        0.11-0.47      2352 
+  best_of_n_masked         8       5        5        0.11-0.47      1563 
+  ttso_pinned             14      10        9        0.26-0.66      2352   6.30
+  ttso_pinned_masked      17      12       11        0.34-0.74      1563   5.32
+  ttso_unpinned           15      11        5        0.11-0.47      2824   6.55
+  peak MPS allocated 1.53 GB
+.
+2 passed in 615.62s (0:10:15)

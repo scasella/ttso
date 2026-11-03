@@ -74,9 +74,9 @@ Cartridge options:
 | `core/token_classes.py` | `TokenClassManager`: equivalence classes, type-head tokens, `W_decl`, `W_lit`, `G_type` |
 | `core/routing.py` | `diagnose`; `Router` with the policies `smart`, `upstream` (v1), `local`, `blind`; `RepairState` (bans, edited sites) |
 | `backends/` | `hf_mps.py` (crop, or checkpoint-and-replay for hybrid models), `llamacpp.py` (`kv_cache_seq_rm`), `scripted.py` (deterministic test LM), `base.py` (`pick` with a lazy token filter) |
-| `cartridges/` | `bendlite.py` (catalog subset, U32 / Nat), `typed_json_dag.py` (typed tool-call DAGs and the `SchemaPrefix` forward mask), `synthetic.py` (SynthLang for Gates 1–2) |
-| `engine/` | `repair_loop.py` (the 3-round loop, Best-of-N), `benchmark.py` (tasks, paired statistics, Wilson intervals, Holm) |
-| `scripts/` | `benchmark_v02.py` (the pre-registered held-out run), `dev_v02.py`, `recheck_bon_masked_v02.py` |
+| `cartridges/` | `bendlite.py` (catalog subset, U32 / Nat, optional `pin_inputs`), `typed_json_dag.py` (typed tool-call DAGs; the forward mask as the incremental `SchemaState` / `SchemaTrail`, with v0.2's re-parsing `SchemaPrefix` kept as the reference), `synthetic.py` (SynthLang for Gates 1–2) |
+| `engine/` | `repair_loop.py` (the 3-round loop, Best-of-N), `benchmark.py` (JSON DAG tasks, the paired harness with pluggable suites and an optional shared greedy decode, paired statistics, Wilson intervals, Holm), `catalog_suite.py` (the frozen v0.3 BendLite catalog prompts and outcomes) |
+| `scripts/` | `benchmark_v03.py` (v0.3, Qwen3.5-0.8B: `{json,catalog} {dev,heldout}`), `benchmark_v02.py` (v0.2's held-out run), `dev_v02.py`, `recheck_bon_masked_v02.py` |
 
 ## Held-out benchmark (v0.2, pre-registered)
 

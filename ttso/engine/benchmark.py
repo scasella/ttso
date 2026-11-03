@@ -132,41 +132,76 @@ def _outcome(task, verdict, text):
             "faithful": faithful(task, verdict, text), "error": verdict.error}
 
 
-def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperature=0.7, log=print):
+class JSONDAGSuite:
+    """The typed JSON DAG tasks: a raw few-shot prompt, outcomes judged by correct() / faithful()."""
+
+    def prompt_ids(self, backend, task):
+        return backend.encode(prompt_of(task))
+
+    def outcome(self, task, verdict, text):
+        return _outcome(task, verdict, text)
+
+
+def _counters(backend):
+    return getattr(backend, "rewinds", 0), getattr(backend, "replayed", 0)
+
+
+def _mask_s(cart):
+    return getattr(cart, "mask_seconds", 0.0)  # time in the forward mask's accept() / candidates()
+
+
+def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperature=0.7, log=print,
+        suite=None, share_greedy=False):
     """Paired benchmark.
 
-    regimes: {name: (cartridge, policy)}. Each regime re-decodes greedy with its own cartridge's
+    regimes: {name: (cartridge, policy)}. Each regime decodes greedy with its own cartridge's
     decoding constraints (so its latency includes it), then repairs. Greedy arms: "greedy" and
     "greedy_masked", one per forward-mask setting, from the first regime with that setting
-    (`same_greedy` records whether later regimes reproduced it). bon: {arm: regime}, a Best-of-N
-    arm decoded with that regime's cartridge and matched per problem to its extra tokens (default:
-    {"best_of_n": first regime}). When the regime spent nothing (greedy valid), the arm is greedy.
+    (`same_greedy` records whether later regimes reproduced it). With share_greedy, later regimes
+    with the same mask setting reuse that decode (tokens, logits and a copy of its KV cache)
+    instead of re-decoding, and their latency counts the shared decode's time; this assumes those
+    regimes' cartridges constrain decoding alike (backend.fork_cache must be supported). bon: {arm: regime},
+    a Best-of-N arm decoded with that regime's cartridge and matched per problem to its extra
+    tokens (default: {"best_of_n": first regime}). When the regime spent nothing (greedy valid),
+    the arm is greedy. suite: prompts and outcomes (default: the typed JSON DAG tasks).
     """
+    suite = suite or JSONDAGSuite()
     loops = {k: RepairLoop(backend, c, policy=p, k_max=k_max, max_new_tokens=max_new_tokens)
              for k, (c, p) in regimes.items()}
     bon = {"best_of_n": next(iter(regimes))} if bon is None else bon
     gname = lambda k: "greedy_masked" if getattr(regimes[k][0], "apply_forward_mask", False) else "greedy"
     rows = []
     for task in tasks:
-        P = backend.encode(prompt_of(task))
+        P = suite.prompt_ids(backend, task)
         row = {"i": task["i"], "task": task["text"], "expected": task["expected"], "seconds": {}}
-        greedy_toks = {}
+        greedy_toks, shared = {}, {}
         for name, loop in loops.items():
             cart = regimes[name][0]
-            t0 = time.time()
-            g = loop.greedy(P)
-            t_greedy = time.time() - t0
             arm = gname(name)
+            t0, reused = time.time(), arm in shared
+            if reused:
+                toks, z, cache, t_greedy, m_greedy = shared[arm]
+                g = (toks, z, backend.fork_cache(cache))
+            else:
+                m0 = _mask_s(cart)
+                g = loop.greedy(P)
+                t_greedy, m_greedy = time.time() - t0, _mask_s(cart) - m0
+                if share_greedy:
+                    shared[arm] = (g[0], g[1], backend.fork_cache(g[2]), t_greedy, m_greedy)
+                t0 += t_greedy  # t0 now marks the start of repair
             if arm not in greedy_toks:
                 greedy_toks[arm] = g[0]
                 text = backend.decode(g[0])
-                row[arm] = _outcome(task, cart.check(g[0]), text) | {"tokens": len(g[0]), "text": text,
-                                                                     "seconds": round(t_greedy, 3)}
+                row[arm] = suite.outcome(task, cart.check(g[0]), text) | {
+                    "tokens": len(g[0]), "text": text, "seconds": round(t_greedy, 3), "mask_s": m_greedy}
+            c0, m0 = _counters(backend), _mask_s(cart)
             res = loop.repair(P, greedy=g)
-            t_total = time.time() - t0
-            row[name] = _outcome(task, res.verdict, res.text) | {
+            t_total = t_greedy + time.time() - t0
+            c1 = _counters(backend)
+            row[name] = suite.outcome(task, res.verdict, res.text) | {
                 "rounds": res.rounds, "extra_tokens": res.extra_tokens, "history": res.history,
-                "text": res.text, "same_greedy": g[0] == greedy_toks[arm]}
+                "text": res.text, "same_greedy": g[0] == greedy_toks[arm], "shared_greedy": reused,
+                "rewinds": c1[0] - c0[0], "replayed": c1[1] - c0[1], "mask_s": m_greedy + _mask_s(cart) - m0}
             row["seconds"][name] = {"greedy": round(t_greedy, 3), "total": round(t_total, 3)}
         for arm, reg in bon.items():
             g_arm = row[gname(reg)]
@@ -174,11 +209,12 @@ def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperat
             if g_arm["valid"] or budget == 0:
                 row[arm] = {k: g_arm[k] for k in ("valid", "correct", "faithful", "error")} | {"samples": 0, "tokens": 0}
                 continue
-            t0 = time.time()
+            t0, m0 = time.time(), _mask_s(regimes[reg][0])
             (toks, v), n, spent = loops[reg].best_of_n(P, budget, temperature=temperature, seed=task["i"])
             text = backend.decode(toks)
-            row[arm] = _outcome(task, v, text) | {"samples": n, "tokens": spent, "text": text,
-                                                   "seconds": round(time.time() - t0, 3)}
+            row[arm] = suite.outcome(task, v, text) | {"samples": n, "tokens": spent, "text": text,
+                                                        "seconds": round(time.time() - t0, 3),
+                                                        "mask_s": _mask_s(regimes[reg][0]) - m0}
         rows.append(row)
         mark = lambda r: "F" if r["faithful"] else ("C" if r["correct"] else ("v" if r["valid"] else "x"))
         arms = sorted(greedy_toks) + list(loops) + list(bon)
@@ -198,9 +234,11 @@ def summarize(rows, regimes, bons=("best_of_n",), backend=None):
         s[k]["faithful_wilson95"] = wilson(s[k]["faithful"], n)
     for k in regimes:
         sec = [r["seconds"][k]["total"] for r in rows]
+        rw, rp = sum(r[k].get("rewinds", 0) for r in rows), sum(r[k].get("replayed", 0) for r in rows)
         s[k].update(extra_tokens_total=sum(get(k, "extra_tokens")),
                     latency_mean_s=sum(sec) / n, latency_max_s=max(sec),
-                    same_greedy=all(get(k, "same_greedy")))
+                    same_greedy=all(get(k, "same_greedy")), rewinds=rw, replayed_tokens=rp,
+                    replayed_per_rewind=rp / rw if rw else None)
     for k in bons:
         s[k]["tokens_total"] = sum(get(k, "tokens"))
     for g in ("greedy", "greedy_masked"):
@@ -208,6 +246,8 @@ def summarize(rows, regimes, bons=("best_of_n",), backend=None):
             s[g]["latency_mean_s"] = sum(r[g]["seconds"] for r in rows) / n
     if backend is not None and backend.peak_memory() is not None:
         s["peak_mps_allocated_gb"] = backend.peak_memory() / 1e9
+    if getattr(backend, "hybrid", False):
+        s["ckpt_peak_mib"] = backend.ckpt_bytes_peak / 2**20
     return s
 
 
