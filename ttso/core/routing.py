@@ -98,24 +98,29 @@ def diagnose(net, cart, tokens, logits, dtype=torch.float32, detach_state=False,
                      flagged, G.grads, c.uses_before, lx)
 
 
-def gradient_pick(z, g, allowed, banned):
-    """argmax over allowed, non-banned tokens with -g_v > 0 of -g_v + 1e-5 z_v (None if empty)."""
-    score = -g.float()
-    C = allowed & ~banned & (score > 0)
+def _best(s, C, accept):
     if not bool(C.any()):
         return None
-    s = score + TIE * z.float()
+    s = s.clone()
     s[~C] = float("-inf")
-    return int(s.argmax())
+    if accept is None:
+        return int(s.argmax())
+    n = int(C.sum())
+    for v in torch.argsort(s, descending=True)[:n].tolist():
+        if accept(v):
+            return v
+    return None
 
 
-def best_pick(z, allowed, banned):
-    m = allowed & ~banned
-    if not bool(m.any()):
-        return None
-    s = z.float().clone()
-    s[~m] = float("-inf")
-    return int(s.argmax())
+def gradient_pick(z, g, allowed, banned, accept=None):
+    """argmax over allowed, non-banned tokens with -g_v > 0 of -g_v + 1e-5 z_v (None if empty);
+    with `accept`, the best such token the forward mask accepts."""
+    score = -g.float()
+    return _best(score + TIE * z.float(), allowed & ~banned & (score > 0), accept)
+
+
+def best_pick(z, allowed, banned, accept=None):
+    return _best(z.float(), allowed & ~banned, accept)
 
 
 class Router:
@@ -140,17 +145,30 @@ class Router:
     def _banned(self, state, tokens, t, site):
         return state.taboo.get(t, torch.zeros(self.tcm.V, dtype=torch.bool)) | self._ban(tokens, t, site)
 
+    def _accept(self, tokens, t):
+        if not getattr(self.cart, "apply_forward_mask", False):
+            return None
+        head = list(tokens[:t])
+        return lambda v: self.cart.accept(head, v)
+
+    def _allowed(self, tokens, t, site):
+        allowed = self.cart.valid_mask(tokens, t, site)
+        if getattr(self.cart, "apply_forward_mask", False):
+            allowed = allowed & self.cart.candidates(list(tokens[:t]))
+        return allowed
+
     def _gradient_edit(self, d, tokens, logits, state, t, case, route):
         site = d.lexed.sites.get(t, "other")
-        allowed = self.cart.valid_mask(tokens, t, site)
-        new = gradient_pick(logits[t], d.grads[t], allowed, self._banned(state, tokens, t, site))
+        allowed = self._allowed(tokens, t, site)
+        new = gradient_pick(logits[t], d.grads[t], allowed, self._banned(state, tokens, t, site),
+                            self._accept(tokens, t))
         return None if new is None else Edit(t, int(tokens[t]), new, case, route, site)
 
     def _local_edit(self, d, tokens, logits, state, t, case="C", route="local"):
         t = min(t, len(tokens) - 1)
         site = d.lexed.sites.get(t, "other")
-        allowed = self.cart.valid_mask(tokens, t, site)
-        new = best_pick(logits[t], allowed, self._banned(state, tokens, t, site))
+        allowed = self._allowed(tokens, t, site)
+        new = best_pick(logits[t], allowed, self._banned(state, tokens, t, site), self._accept(tokens, t))
         return None if new is None else Edit(t, int(tokens[t]), new, case, route, site)
 
     def choose(self, d, tokens, logits, state):

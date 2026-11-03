@@ -20,9 +20,14 @@ Ops compiled into the DeltaNet (slot = input or node id):
                                     CHECK_VAR(n, U32)               at the converter      "convert result"
     "call": {"x": "6n"}             CHECK_CALL(x)                   at the suffix token   "call arg"
 The suffix token is the token right after a literal's digits (the closing quote for a plain U32).
-With pin_inputs=True the input types are frozen (the prompt's contract); a failed ref / convert
-check then falls back to banning the arg's key token ("ref" / "convert"), so the model can rewrite
-the argument as a conversion (LocalOnly).
+With pin_inputs=True (the default) the input types are frozen as the prompt's contract; a failed
+ref / convert check then falls back to banning the arg's key token ("ref" / "convert"), so the
+model can rewrite the argument as a conversion (LocalOnly). pin_inputs=False is the spec's routing.
+
+apply_forward_mask=True adds a forward structural mask (SchemaPrefix): every decoded token, and every
+repair edit, must keep the completion a prefix of the schema. It enforces structure and scope (key
+order, literal forms, fresh / declared ids, complete call bindings), never types, so the type
+errors are still the verifier's to repair.
 Hard errors (no gradient): malformed JSON or schema, unknown ids or ops, bad literals, unbound or
 unknown call inputs, an out_type given after its args.
 """
@@ -180,12 +185,237 @@ def json_end(text):
     return None
 
 
+class _More(Exception):
+    """The text ended inside a valid prefix."""
+
+
+class _Bad(Exception):
+    """The text left the schema."""
+
+
+NAME_HEAD = set("abcdefghijklmnopqrstuvwxyz_")
+NAME_CHARS = NAME_HEAD | set("0123456789")
+ARG_KEYS = ("ref", "lit", "convert")
+
+
+class SchemaPrefix:
+    """Character-level acceptor for the workflow schema (the forward structural mask).
+
+    It fixes the key order (inputs, nodes, output, call; id, type; id, op, out_type, args), one key per
+    argument, op and type names, the five literal forms ("7", "7n", "7.5", "7usd", "7eur"), fresh ids
+    for new inputs and nodes, refs and conversions only to ids declared earlier, an output naming a
+    node, and a call binding every input exactly once. It never looks at types: whether a ref or a
+    literal has the right type is left to the verifier. check(text) -> "more" | "done" | "bad".
+    """
+
+    def __init__(self, text):
+        self.s, self.i = text, 0
+        self.inputs, self.nodes = [], []
+
+    def check(self):
+        try:
+            self._doc()
+        except _More:
+            return "more"
+        except _Bad:
+            return "bad"
+        return "done" if not self.s[self.i:].strip() else "bad"
+
+    def _c(self):
+        if self.i >= len(self.s):
+            raise _More
+        return self.s[self.i]
+
+    def _ws(self):
+        while self.i < len(self.s) and self.s[self.i] in " \n":
+            self.i += 1
+
+    def _lit(self, w):
+        for ch in w:
+            if self._c() != ch:
+                raise _Bad
+            self.i += 1
+
+    def _key(self, k):
+        self._ws()
+        self._lit(f'"{k}"')
+        self._ws()
+        self._lit(":")
+        self._ws()
+
+    def _until(self, stop, allowed, charset=None):
+        start = self.i
+        while self.i < len(self.s) and self.s[self.i] != stop:
+            if charset is not None and self.s[self.i] not in (NAME_HEAD if self.i == start else charset):
+                raise _Bad
+            self.i += 1
+        part = self.s[start:self.i]
+        if allowed is not None and not any(a.startswith(part) for a in allowed):
+            raise _Bad
+        if self.i >= len(self.s):
+            raise _More
+        if not part or (allowed is not None and part not in allowed):
+            raise _Bad
+        return part
+
+    def _word(self, allowed):
+        self._lit('"')
+        w = self._until('"', allowed)
+        self.i += 1
+        return w
+
+    def _name(self, allowed=None, taken=()):
+        self._lit('"')
+        w = self._until('"', allowed, NAME_CHARS)
+        if w in taken:
+            raise _Bad
+        self.i += 1
+        return w
+
+    def _literal(self):
+        self._lit('"')
+        start = self.i
+        while self.i < len(self.s) and self.s[self.i].isdigit():
+            self.i += 1
+        c = self._c()
+        if self.i == start:
+            raise _Bad
+        if c == '"':
+            self.i += 1
+        elif c == "n":
+            self._lit('n"')
+        elif c == ".":
+            self.i += 1
+            d = self.i
+            while self.i < len(self.s) and self.s[self.i].isdigit():
+                self.i += 1
+            if self._c() != '"' or self.i == d:
+                raise _Bad
+            self.i += 1
+        elif c == "u":
+            self._lit('usd"')
+        elif c == "e":
+            self._lit('eur"')
+        else:
+            raise _Bad
+
+    def _sep(self, more, close):
+        """After a list item: True to continue (`more` read), False when `close` ends the list."""
+        self._ws()
+        c = self._c()
+        if c in (more, close):
+            self.i += 1
+            return c == more
+        raise _Bad
+
+    def _doc(self):
+        self._ws()
+        self._lit("{")
+        self._key("inputs")
+        self._lit("[")
+        while True:
+            self._ws()
+            self._lit("{")
+            self._key("id")
+            x = self._name(taken=self.inputs)
+            self._ws()
+            self._lit(",")
+            self._key("type")
+            self._word(TYPES)
+            self._ws()
+            self._lit("}")
+            self.inputs.append(x)
+            if not self._sep(",", "]"):
+                break
+        self._ws()
+        self._lit(",")
+        self._key("nodes")
+        self._lit("[")
+        while True:
+            self._ws()
+            self._lit("{")
+            self._key("id")
+            x = self._name(taken=self.inputs + self.nodes)
+            for k, allowed in (("op", OPS), ("out_type", TYPES)):
+                self._ws()
+                self._lit(",")
+                self._key(k)
+                self._word(allowed)
+            self._ws()
+            self._lit(",")
+            self._key("args")
+            self._lit("[")
+            while True:
+                self._ws()
+                self._lit("{")
+                self._ws()
+                k = self._word(ARG_KEYS)
+                self._ws()
+                self._lit(":")
+                self._ws()
+                if k == "ref":
+                    self._name(allowed=self.inputs + self.nodes)
+                elif k == "lit":
+                    self._literal()
+                else:
+                    self._lit('"')
+                    self._until("(", tuple(CONVERT))
+                    self.i += 1
+                    self._until(")", self.inputs + self.nodes, NAME_CHARS)
+                    self.i += 1
+                    self._lit('"')
+                self._ws()
+                self._lit("}")
+                if not self._sep(",", "]"):
+                    break
+            self._ws()
+            self._lit("}")
+            self.nodes.append(x)
+            if not self._sep(",", "]"):
+                break
+        self._ws()
+        self._lit(",")
+        self._key("output")
+        self._name(allowed=self.nodes)
+        self._ws()
+        self._lit(",")
+        self._key("call")
+        self._lit("{")
+        bound = []
+        while True:
+            self._ws()
+            bound.append(self._name(allowed=[a for a in self.inputs if a not in bound]))
+            self._ws()
+            self._lit(":")
+            self._ws()
+            self._literal()
+            self._ws()
+            c = self._c()
+            if c == "," and len(bound) < len(self.inputs):
+                self.i += 1
+            elif c == "}" and len(bound) == len(self.inputs):
+                self.i += 1
+                break
+            else:
+                raise _Bad
+        self._ws()
+        self._lit("}")
+
+
+def schema_state(text):
+    return SchemaPrefix(text).check()
+
+
 class TypedJSONDAGCartridge(Cartridge):
     type_names = list(TYPES)
 
-    def __init__(self, token_texts, encode=None, special_ids=(), n_slots=64, pin_inputs=False):
+    def __init__(self, token_texts, encode=None, special_ids=(), n_slots=64, pin_inputs=True,
+                 apply_forward_mask=False):
         self.texts = token_texts
         self.pin_inputs = pin_inputs  # input types are the prompt's contract: never edit them
+        self.apply_forward_mask = apply_forward_mask  # decode inside the schema (SchemaPrefix)
+        self._special = set(special_ids)
+        self._first = None
         self.n_slots = n_slots
         self._tcm = TokenClassManager(token_texts, TYPES, lit_rule=_lit_rule, lit_default=U32,
                                       special_ids=special_ids, encode=encode)
@@ -204,6 +434,32 @@ class TypedJSONDAGCartridge(Cartridge):
 
     def stop(self, tokens):
         return json_end(self.text(tokens)) is not None
+
+    def candidates(self, tokens):
+        """A cheap superset of the tokens `accept` admits: those whose first character the schema
+        allows next (every admitted token starts with one), plus EOS once the document is done."""
+        if self._first is None:
+            self._first = {}
+            for i, t in enumerate(self.texts):
+                if t and i not in self._special:
+                    self._first.setdefault(t[0], []).append(i)
+            self._first = {c: torch.tensor(ids) for c, ids in self._first.items()}
+        head = self.text(tokens)
+        m = torch.zeros(len(self.texts), dtype=torch.bool)
+        for c, ids in self._first.items():
+            if c.isascii() and schema_state(head + c) != "bad":
+                m[ids] = True
+        if schema_state(head) == "done":
+            m[list(self._special)] = True
+        return m
+
+    def accept(self, tokens, cand):
+        """Forward structural mask: may token `cand` follow completion `tokens`? (EOS only once the
+        document is complete; other special tokens never.)"""
+        head = self.text(tokens)
+        if int(cand) in self._special:
+            return schema_state(head) == "done"
+        return schema_state(head + self.texts[int(cand)]) != "bad"
 
     def logits_processor(self, tokens, z):
         """Schema-level constrained decoding: a type slot admits only the five type names."""

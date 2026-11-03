@@ -31,6 +31,19 @@ class RepairResult:
     greedy_valid: bool = False
 
 
+class ForwardMask:
+    """The cartridge's forward structural mask as a decoding filter after a fixed head."""
+
+    def __init__(self, cart, head):
+        self.cart, self.head = cart, list(head)
+
+    def __call__(self, new, v):
+        return self.cart.accept(self.head + list(new), v)
+
+    def candidates(self, new):
+        return self.cart.candidates(self.head + list(new))
+
+
 class RepairLoop:
     def __init__(self, backend, cartridge, policy="smart", k_max=3, max_new_tokens=256,
                  verifier_dtype=torch.float32, verifier_device="cpu", constrain=True):
@@ -45,11 +58,13 @@ class RepairLoop:
         head = list(head)
         stop = lambda new: self.cart.stop(head + new)
         proc = (lambda new, z: self.cart.logits_processor(head + new, z)) if self.constrain else None
-        return stop, proc
+        acc = ForwardMask(self.cart, head) if getattr(self.cart, "apply_forward_mask", False) else None
+        return stop, proc, acc
 
     def greedy(self, prompt_ids):
-        stop, proc = self._hooks([])
-        toks, z, cache = self.backend.generate_from(prompt_ids, None, self.max_new, stop=stop, logits_processor=proc)
+        stop, proc, acc = self._hooks([])
+        toks, z, cache = self.backend.generate_from(prompt_ids, None, self.max_new, stop=stop, logits_processor=proc,
+                                                    accept=acc)
         return toks, z, cache
 
     def repair(self, prompt_ids, greedy=None):
@@ -77,12 +92,12 @@ class RepairLoop:
             rec.update(t_star=e.t, old=texts[e.old], new=texts[e.new], case=e.case, route=e.route, site=e.site)
             cache = self.backend.rewind_kv_cache(cache, P + e.t)
             head = toks[:e.t] + [e.new]
-            stop, proc = self._hooks(head)
+            stop, proc, acc = self._hooks(head)
             if self.cart.stop(head):
                 new, z_new = [], torch.zeros(0, z.shape[1])
             else:
                 new, z_new, cache = self.backend.generate_from([e.new], cache, max(self.max_new - e.t - 1, 0),
-                                                               stop=stop, logits_processor=proc)
+                                                               stop=stop, logits_processor=proc, accept=acc)
             toks = head + as_list(new)
             z = torch.cat([z[:e.t + 1], z_new.to(z.dtype)], 0)
             res.extra_tokens += 1 + len(new)
@@ -99,10 +114,10 @@ class RepairLoop:
         """Sample until `budget` extra tokens are spent; returns (best result, samples, tokens)."""
         g = torch.Generator().manual_seed(seed)
         spent, n, best = 0, 0, None
-        stop, proc = self._hooks([])
+        stop, proc, acc = self._hooks([])
         while spent < budget:
             toks, _, _ = self.backend.generate_from(prompt_ids, None, min(self.max_new, budget - spent),
-                                                    stop=stop, logits_processor=proc,
+                                                    stop=stop, logits_processor=proc, accept=acc,
                                                     temperature=temperature, generator=g)
             toks = as_list(toks)
             spent += max(len(toks), 1)

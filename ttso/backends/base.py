@@ -7,8 +7,8 @@ pre-softmax logits token i was chosen from, and the cache, which holds every tok
 (the last generated token is not fed). rewind_kv_cache(kv_cache, n) keeps the first n positions.
 
 Decoding is greedy unless temperature > 0. `stop(new_ids)` ends decoding after a token;
-`logits_processor(new_ids, z)` constrains the choice (the cached row stays raw). EOS ends decoding
-and is not returned.
+`logits_processor(new_ids, z)` constrains the choice (the cached row stays raw); `accept(new_ids, v)`
+is a lazy token filter (the forward structural mask). EOS ends decoding and is not returned.
 """
 
 from abc import ABC, abstractmethod
@@ -38,7 +38,7 @@ class Backend(ABC):
 
     @abstractmethod
     def generate_from(self, prefix_ids, kv_cache, max_new_tokens, stop=None, logits_processor=None,
-                      temperature=0.0, generator=None):
+                      temperature=0.0, generator=None, accept=None):
         ...
 
     @abstractmethod
@@ -54,8 +54,52 @@ class Backend(ABC):
         return None
 
 
-def pick(z, temperature=0.0, generator=None):
-    if temperature and temperature > 0:
-        p = torch.softmax(z.float() / temperature, -1)
-        return int(torch.multinomial(p.cpu(), 1, generator=generator))
-    return int(z.argmax())
+def bind(accept, out):
+    """accept(new_ids, v) -> a one-argument filter over the current `out`, keeping `candidates`."""
+    if accept is None:
+        return None
+    f = lambda v: accept(out, v)
+    if hasattr(accept, "candidates"):
+        f.candidates = lambda: accept.candidates(out)
+    return f
+
+
+def pick(z, temperature=0.0, generator=None, accept=None):
+    """Greedy or temperature sampling; with `accept(token) -> bool`, only accepted tokens.
+
+    The top token (or the first draw) is tried first. If it is rejected and the filter offers
+    `candidates()` (a boolean superset of the accepted tokens), only those are considered: greedy
+    takes the highest-scoring accepted one; sampling redraws without replacement until a draw is
+    accepted, which samples exactly from the distribution restricted to accepted tokens."""
+    if accept is None:
+        if temperature and temperature > 0:
+            p = torch.softmax(z.float() / temperature, -1)
+            return int(torch.multinomial(p.cpu(), 1, generator=generator))
+        return int(z.argmax())
+    sampling = bool(temperature and temperature > 0)
+    zf = z.float().cpu()
+    if sampling:
+        p = torch.softmax(zf / temperature, -1)
+        v = int(torch.multinomial(p, 1, generator=generator))
+    else:
+        v = int(zf.argmax())
+    if accept(v):
+        return v
+    cand = accept.candidates() if hasattr(accept, "candidates") else torch.ones_like(zf, dtype=torch.bool)
+    cand = cand.clone()
+    cand[v] = False
+    if sampling:
+        p = p * cand
+        for _ in range(int(cand.sum())):
+            if float(p.sum()) <= 0:
+                break
+            v = int(torch.multinomial(p, 1, generator=generator))
+            if accept(v):
+                return v
+            p[v] = 0.0
+        return v
+    s = zf.masked_fill(~cand, float("-inf"))
+    for v in torch.argsort(s, descending=True)[:int(cand.sum())].tolist():
+        if accept(v):
+            return v
+    return int(zf.argmax())

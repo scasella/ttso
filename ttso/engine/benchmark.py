@@ -10,7 +10,7 @@ until it has spent the same number of extra tokens as the first ttso regime spen
 import json
 import random
 import time
-from math import comb
+from math import comb, sqrt
 
 import torch
 
@@ -101,6 +101,7 @@ def faithful(task, verdict, text):
 
 
 def mcnemar(a, b):
+    """Exact two-sided McNemar test on paired booleans."""
     x = sum(p and not q for p, q in zip(a, b))
     y = sum(q and not p for p, q in zip(a, b))
     n, k = x + y, min(x, y)
@@ -108,74 +109,110 @@ def mcnemar(a, b):
             "p": min(1.0, 2 * sum(comb(n, j) for j in range(k + 1)) / 2 ** n) if n else 1.0}
 
 
-def run(backend, regimes, tasks, k_max=3, max_new_tokens=320, temperature=0.7, log=print):
-    """regimes: {name: (cartridge, policy)}. The first regime sets Best-of-N's token budget. Every
-    regime re-decodes the greedy completion, so its latency includes it; `same_greedy` records
-    whether it reproduced the first regime's (decoding on mps is expected to be deterministic)."""
+def wilson(k, n, z=1.96):
+    if n == 0:
+        return [0.0, 1.0]
+    p, d = k / n, 1 + z * z / n
+    c, h = (p + z * z / (2 * n)) / d, z * sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return [round(max(0.0, c - h), 4), round(min(1.0, c + h), 4)]
+
+
+def holm(ps):
+    """Holm-adjusted p-values for a {name: p} dict."""
+    order = sorted(ps, key=ps.get)
+    out, run_max = {}, 0.0
+    for j, k in enumerate(order):
+        run_max = max(run_max, min(1.0, (len(order) - j) * ps[k]))
+        out[k] = run_max
+    return out
+
+
+def _outcome(task, verdict, text):
+    return {"valid": verdict.valid, "correct": correct(task, verdict, text),
+            "faithful": faithful(task, verdict, text), "error": verdict.error}
+
+
+def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperature=0.7, log=print):
+    """Paired benchmark.
+
+    regimes: {name: (cartridge, policy)}. Each regime re-decodes greedy with its own cartridge's
+    decoding constraints (so its latency includes it), then repairs. Greedy arms: "greedy" and
+    "greedy_masked", one per forward-mask setting, from the first regime with that setting
+    (`same_greedy` records whether later regimes reproduced it). bon: {arm: regime}, a Best-of-N
+    arm decoded with that regime's cartridge and matched per problem to its extra tokens (default:
+    {"best_of_n": first regime}). When the regime spent nothing (greedy valid), the arm is greedy.
+    """
     loops = {k: RepairLoop(backend, c, policy=p, k_max=k_max, max_new_tokens=max_new_tokens)
              for k, (c, p) in regimes.items()}
-    first = next(iter(regimes))
-    cart = regimes[first][0]
+    bon = {"best_of_n": next(iter(regimes))} if bon is None else bon
+    gname = lambda k: "greedy_masked" if getattr(regimes[k][0], "apply_forward_mask", False) else "greedy"
     rows = []
     for task in tasks:
         P = backend.encode(prompt_of(task))
         row = {"i": task["i"], "task": task["text"], "expected": task["expected"], "seconds": {}}
-        g0 = None
+        greedy_toks = {}
         for name, loop in loops.items():
+            cart = regimes[name][0]
             t0 = time.time()
             g = loop.greedy(P)
             t_greedy = time.time() - t0
-            if g0 is None:
-                g0 = g[0]
+            arm = gname(name)
+            if arm not in greedy_toks:
+                greedy_toks[arm] = g[0]
                 text = backend.decode(g[0])
-                v = cart.check(g[0])
-                row["greedy"] = {"valid": v.valid, "correct": correct(task, v, text), "faithful": faithful(task, v, text),
-                                 "error": v.error, "tokens": len(g[0]), "text": text}
+                row[arm] = _outcome(task, cart.check(g[0]), text) | {"tokens": len(g[0]), "text": text,
+                                                                     "seconds": round(t_greedy, 3)}
             res = loop.repair(P, greedy=g)
             t_total = time.time() - t0
-            row[name] = {"valid": res.verdict.valid, "correct": correct(task, res.verdict, res.text),
-                         "faithful": faithful(task, res.verdict, res.text), "error": res.verdict.error,
-                         "rounds": res.rounds, "extra_tokens": res.extra_tokens, "history": res.history,
-                         "text": res.text, "same_greedy": g[0] == g0}
+            row[name] = _outcome(task, res.verdict, res.text) | {
+                "rounds": res.rounds, "extra_tokens": res.extra_tokens, "history": res.history,
+                "text": res.text, "same_greedy": g[0] == greedy_toks[arm]}
             row["seconds"][name] = {"greedy": round(t_greedy, 3), "total": round(t_total, 3)}
-        budget = row[first]["extra_tokens"]
-        if row["greedy"]["valid"] or budget == 0:
-            bon = {k: row["greedy"][k] for k in ("valid", "correct", "faithful")} | {"samples": 0, "tokens": 0}
-        else:
-            (toks, v), n, spent = loops[first].best_of_n(P, budget, temperature=temperature, seed=task["i"])
+        for arm, reg in bon.items():
+            g_arm = row[gname(reg)]
+            budget = row[reg]["extra_tokens"]
+            if g_arm["valid"] or budget == 0:
+                row[arm] = {k: g_arm[k] for k in ("valid", "correct", "faithful", "error")} | {"samples": 0, "tokens": 0}
+                continue
+            t0 = time.time()
+            (toks, v), n, spent = loops[reg].best_of_n(P, budget, temperature=temperature, seed=task["i"])
             text = backend.decode(toks)
-            bon = {"valid": v.valid, "correct": correct(task, v, text), "faithful": faithful(task, v, text),
-                   "samples": n, "tokens": spent, "text": text}
-        row["best_of_n"] = bon
+            row[arm] = _outcome(task, v, text) | {"samples": n, "tokens": spent, "text": text,
+                                                   "seconds": round(time.time() - t0, 3)}
         rows.append(row)
         mark = lambda r: "F" if r["faithful"] else ("C" if r["correct"] else ("v" if r["valid"] else "x"))
-        log(f"[{task['i']:2d}] greedy {mark(row['greedy'])} | " +
-            " | ".join(f"{k} {mark(row[k])} r={row[k]['rounds']} +{row[k]['extra_tokens']} "
-                       f"{row['seconds'][k]['total']:.1f}s" for k in loops) +
-            f" | BoN {mark(bon)} n={bon['samples']}   {row['greedy']['error']}")
-    return rows, summarize(rows, list(loops), backend)
+        arms = sorted(greedy_toks) + list(loops) + list(bon)
+        log(f"[{task['i']:2d}] " + " | ".join(
+            f"{k} {mark(row[k])}" + (f" r={row[k]['rounds']} +{row[k]['extra_tokens']}" if k in loops else "")
+            for k in arms))
+    return rows, summarize(rows, list(regimes), list(bon), backend)
 
 
-def summarize(rows, regimes, backend=None):
+def summarize(rows, regimes, bons=("best_of_n",), backend=None):
     n = len(rows)
+    arms = [k for k in ("greedy", "greedy_masked") if k in rows[0]] + list(bons) + list(regimes)
     get = lambda k, f: [r[k][f] for r in rows]
-    s = {"n": n, "regimes": regimes}
-    for k in ["greedy", "best_of_n"] + regimes:
+    s = {"n": n, "arms": arms}
+    for k in arms:
         s[k] = {f: sum(get(k, f)) for f in ("valid", "correct", "faithful")}
+        s[k]["faithful_wilson95"] = wilson(s[k]["faithful"], n)
     for k in regimes:
         sec = [r["seconds"][k]["total"] for r in rows]
         s[k].update(extra_tokens_total=sum(get(k, "extra_tokens")),
-                    latency_mean_s=sum(sec) / n, latency_max_s=max(sec))
-        s[f"mcnemar {k}"] = {f: {"vs greedy": mcnemar(get(k, f), get("greedy", f)),
-                                 "vs best_of_n": mcnemar(get(k, f), get("best_of_n", f))}
-                             for f in ("correct", "faithful")}
-    s["repaired_problems"] = sum(1 for r in rows if not r["greedy"]["valid"])
-    s["greedy_reproduced"] = all(r[k]["same_greedy"] for r in rows for k in regimes)
-    s["best_of_n"]["tokens_total"] = sum(get("best_of_n", "tokens"))
-    s["greedy"]["latency_mean_s"] = sum(r["seconds"][regimes[0]]["greedy"] for r in rows) / n
+                    latency_mean_s=sum(sec) / n, latency_max_s=max(sec),
+                    same_greedy=all(get(k, "same_greedy")))
+    for k in bons:
+        s[k]["tokens_total"] = sum(get(k, "tokens"))
+    for g in ("greedy", "greedy_masked"):
+        if g in rows[0]:
+            s[g]["latency_mean_s"] = sum(r[g]["seconds"] for r in rows) / n
     if backend is not None and backend.peak_memory() is not None:
         s["peak_mps_allocated_gb"] = backend.peak_memory() / 1e9
     return s
+
+
+def compare(rows, a, b, f="faithful"):
+    return mcnemar([r[a][f] for r in rows], [r[b][f] for r in rows])
 
 
 def device_info():

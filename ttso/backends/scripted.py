@@ -11,7 +11,7 @@ import math
 
 import torch
 
-from ttso.backends.base import Backend, pick
+from ttso.backends.base import Backend, bind, pick
 
 FLOOR = 1e-6
 
@@ -54,7 +54,7 @@ class ScriptedBackend(Backend):
         return z, bool(mass)
 
     def generate_from(self, prefix_ids, kv_cache, max_new_tokens, stop=None, logits_processor=None,
-                      temperature=0.0, generator=None):
+                      temperature=0.0, generator=None, accept=None):
         ctx = list(kv_cache or []) + list(prefix_ids)
         out, rows = [], []
         for _ in range(max_new_tokens):
@@ -63,7 +63,7 @@ class ScriptedBackend(Backend):
                 self.off_script += 1
                 break
             zz = logits_processor(out, z) if logits_processor else z
-            y = pick(zz, temperature, generator)
+            y = pick(zz, temperature, generator, bind(accept, out))
             if y in self.eos_ids:
                 break
             out.append(y)
