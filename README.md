@@ -11,6 +11,15 @@ It runs a compiled, zero-parameter Gated DeltaNet verifier over the completion. 
 
 This is DiffRepair, the inference-time method from the DiffSpec / DiffRepair study (November 2026), packaged for Apple Silicon. Two backends are included: HuggingFace on `mps`, and llama.cpp with Metal.
 
+**v0.2** makes four changes:
+
+- input types are pinned by default;
+- an optional forward structural mask keeps decoding inside the workflow schema;
+- the HuggingFace backend can rewind hybrid linear-attention models such as Qwen3.5;
+- Gate 4 now checks that the llama.cpp backend reproduces the `mps` backend.
+
+The pre-registered held-out benchmark is below.
+
 ## Install (M4 Pro, macOS)
 
 ```bash
@@ -21,16 +30,19 @@ uv venv .venv --python 3.12
 uv pip install --python .venv/bin/python -e ".[dev]"
 ```
 
-llama.cpp backend (optional). On this macOS / Command Line Tools combination the source build needs the SDK's libc++ headers:
+**llama.cpp backend (optional).** On this macOS / Command Line Tools combination, the source build needs the SDK's libc++ headers:
 
 ```bash
 SDKROOT=$(xcrun --show-sdk-path) CMAKE_ARGS="-DGGML_METAL=on -DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path) -DCMAKE_CXX_FLAGS=-isystem\ $(xcrun --show-sdk-path)/usr/include/c++/v1" uv pip install --python .venv/bin/python llama-cpp-python
 ```
 
-A GGUF can be made from the cached HF weights with the converter that ships in llama.cpp. It needs `gguf-py` from the same source tree, plus `sentencepiece`. The output path `models/qwen3-0.6b-f16.gguf` is what the backend test looks for:
+**GGUF files.** Convert the HF weights with the converter that ships in llama.cpp. It needs `gguf-py` from the same source tree, plus `sentencepiece`. The tests look for two files:
+
+- `models/qwen3-0.6b-f16.gguf`, from Qwen/Qwen3-0.6B, used by the backend test;
+- `models/qwen3-0.6b-base-f16.gguf`, from Qwen/Qwen3-0.6B-Base, used by the Gate 4 parity test.
 
 ```bash
-python <llama.cpp>/convert_hf_to_gguf.py <hf snapshot dir of Qwen/Qwen3-0.6B> --outtype f16 --outfile models/qwen3-0.6b-f16.gguf
+python <llama.cpp>/convert_hf_to_gguf.py <hf snapshot dir> --outtype f16 --outfile models/<name>.gguf
 ```
 
 ## Use
@@ -41,13 +53,18 @@ from ttso.cartridges.typed_json_dag import TypedJSONDAGCartridge
 from ttso.engine.repair_loop import RepairLoop
 
 be = HuggingFaceMPSBackend("Qwen/Qwen3-0.6B-Base")          # float16 on mps
-cart = TypedJSONDAGCartridge(be.token_texts(), encode=be.encode,
-                             special_ids=be.tok.all_special_ids, pin_inputs=True)
+cart = TypedJSONDAGCartridge(be.token_texts(), encode=be.encode, special_ids=be.tok.all_special_ids,
+                             apply_forward_mask=True)       # pin_inputs=True is the default
 res = RepairLoop(be, cart, policy="smart", k_max=3).repair(be.encode(prompt))
 print(res.verdict.valid, res.rounds, res.extra_tokens, res.history)
 ```
 
-`LlamaCppBackend("models/qwen3-0.6b-f16.gguf")` is a drop-in replacement for the backend.
+Cartridge options:
+
+- **`pin_inputs=True`** (default): freezes the input types the prompt fixes. A failed reference is then rewritten as a conversion instead of retyping the input. `pin_inputs=False` gives the original spec routing.
+- **`apply_forward_mask=True`**: every decoded token and every repair edit must keep the completion a prefix of the workflow schema. The mask covers key order, one key per argument, op and type names, the five literal forms, fresh and declared ids, and complete call bindings. It never checks types; those stay the verifier's job.
+
+`LlamaCppBackend("models/qwen3-0.6b-base-f16.gguf")` can be used in place of the HuggingFace backend. `HuggingFaceMPSBackend("Qwen/Qwen3.5-0.8B")` rewinds by restoring checkpoints of the linear-attention state; `ckpt_every`, 16 positions by default, trades memory against replay time.
 
 ## Layout
 
@@ -56,9 +73,57 @@ print(res.verdict.valid, res.rounds, res.extra_tokens, res.history)
 | `core/deltanet.py` | `CompiledDeltaNet`: memory M ∈ R^{S×K}, ops NOOP / DECLARE / CHECK_VAR / CHECK_CALL, straight-through token bridge, `first_failure_gradients` |
 | `core/token_classes.py` | `TokenClassManager`: equivalence classes, type-head tokens, `W_decl`, `W_lit`, `G_type` |
 | `core/routing.py` | `diagnose`; `Router` with the policies `smart`, `upstream` (v1), `local`, `blind`; `RepairState` (bans, edited sites) |
-| `backends/` | `hf_mps.py` (DynamicCache crop), `llamacpp.py` (`kv_cache_seq_rm`), `scripted.py` (deterministic test LM) |
-| `cartridges/` | `bendlite.py` (catalog subset, U32 / Nat), `typed_json_dag.py` (typed tool-call DAGs), `synthetic.py` (SynthLang for Gates 1–2) |
-| `engine/` | `repair_loop.py` (the 3-round loop, Best-of-N), `benchmark.py` (Gate 4 tasks and paired statistics) |
+| `backends/` | `hf_mps.py` (crop, or checkpoint-and-replay for hybrid models), `llamacpp.py` (`kv_cache_seq_rm`), `scripted.py` (deterministic test LM), `base.py` (`pick` with a lazy token filter) |
+| `cartridges/` | `bendlite.py` (catalog subset, U32 / Nat), `typed_json_dag.py` (typed tool-call DAGs and the `SchemaPrefix` forward mask), `synthetic.py` (SynthLang for Gates 1–2) |
+| `engine/` | `repair_loop.py` (the 3-round loop, Best-of-N), `benchmark.py` (tasks, paired statistics, Wilson intervals, Holm) |
+| `scripts/` | `benchmark_v02.py` (the pre-registered held-out run), `dev_v02.py`, `recheck_bon_masked_v02.py` |
+
+## Held-out benchmark (v0.2, pre-registered)
+
+The protocol is in [`runs/v0.2/PREREGISTRATION.md`](runs/v0.2/PREREGISTRATION.md). It was committed and pushed before any held-out task ran.
+
+The forward mask was developed only on Gate 4's 20 seed-0 tasks. The held-out set is 60 new tasks (seed 42), run on Qwen3-0.6B-Base in float16 on `mps`. Each Best-of-N arm samples at temperature 0.7 with its tokens matched per problem to its repair arm; at that budget it drew 1–3 samples per problem.
+
+| Arm | Valid | Correct | Faithful | Faithful 95% CI (Wilson) |
+|---|---|---|---|---|
+| greedy | 23 | 15 | 15 | 0.16–0.37 |
+| best_of_n | 23 | 15 | 15 | 0.16–0.37 |
+| ttso_pinned | 44 | 27 | **26** | 0.32–0.56 |
+| greedy_masked | 29 | 15 | 15 | 0.16–0.37 |
+| best_of_n_masked | 30 | 15 | 15 | 0.16–0.37 |
+| ttso_pinned_masked | 51 | 31 | **30** | 0.38–0.62 |
+| ttso_unpinned (secondary) | 50 | 35 | 15 | 0.16–0.37 |
+
+All four primary hypotheses are supported (Faithful, exact two-sided McNemar, Holm over the four):
+
+| | Comparison | Wins–losses | p | Holm p |
+|---|---|---|---|---|
+| H1 | ttso_pinned vs greedy | 11–0 | 0.00098 | 0.0020 |
+| H2 | ttso_pinned vs best_of_n | 11–0 | 0.00098 | 0.0020 |
+| H3 | ttso_pinned_masked vs greedy_masked | 15–0 | 0.000061 | 0.00024 |
+| H4 | ttso_pinned_masked vs best_of_n_masked | 15–0 | 0.000061 | 0.00024 |
+
+Secondary results, not confirmatory:
+
+- **The mask alone** adds valid programs (29 vs 23, 6–0, p = 0.031) but not one correct program. Every program it rescues computes the wrong value.
+- **The mask added to repair:** 30 vs 26 faithful, 4–0 (p = 0.125).
+- **Unpinned routing** replicates v0.1's finding at n = 60. It has the most correct programs (35), but only 15 are faithful: 20 of its correct programs changed a type the task fixed. Pinned beats it on Faithful 11–0 (p = 0.00098).
+- **Mask integrity:** no masked output left the schema.
+- **A post-hoc bug check:** a bug fixed after the freeze could only have affected masked sampling. It could return an illegal token when every legal token's probability underflowed. Replaying the masked Best-of-N arm with the fix reproduced all 31 base and 15 post-trained outputs exactly (`runs/v0.2/*/bon_masked_recheck.json`), so the bug never fired.
+
+**Post-trained Qwen3-0.6B** (20 held-out tasks, exploratory):
+
+| Arm | Valid | Correct | Faithful |
+|---|---|---|---|
+| greedy / best_of_n | 4 / 4 | 4 / 4 | 4 / 4 |
+| ttso_pinned | 4 | 4 | 4 |
+| greedy_masked / best_of_n_masked | 5 / 5 | 4 / 4 | 4 / 4 |
+| ttso_pinned_masked | 12 | 5 | 5 |
+
+- **Without the mask, repair does nothing.** The first failure on almost every problem is a structural error, usually two keys in one argument, and that comes before any type error.
+- **With the mask, repair makes 7 more programs valid** (7–0, p = 0.016), but correct and faithful rise by only one. Those programs compute the wrong value: they drop an input, name the wrong output node, or take the wrong steps.
+
+So the mask removes the structural errors, but what remains are logic errors, which type repair cannot fix.
 
 ## Gates
 
@@ -68,61 +133,41 @@ Run them with:
 .venv/bin/python -m pytest
 ```
 
-Expect about 6 minutes for the 19 tests, most of it Gate 4. The first run downloads Qwen3-0.6B and Qwen3-0.6B-Base from the Hugging Face Hub. Results from 3 November 2026 on an M4 Pro (24 GB), torch 2.15, transformers 5.22.1, llama-cpp-python 0.3.36:
+There are 22 tests; expect about 15 minutes, most of it Gate 4. The first run downloads Qwen3-0.6B, Qwen3-0.6B-Base and Qwen3.5-0.8B from the Hugging Face Hub. The parity and GGUF tests skip when their GGUF file is missing. The results below are from 3 November 2026, on an M4 Pro (24 GB) with torch 2.15, transformers 5.22.1 and llama-cpp-python 0.3.36.
 
 | Gate | Result |
 |---|---|
-| 1. Exactness and non-fading memory | 200 random programs (27,857 tokens, 3,906 checks) agree with the string-level reference checker on every token. Both the check verdicts and the full memory state after each token match, in float32 and float16, on cpu and mps. The gradient at the declaration is the same at distances 8 and 256 (ratio 1.000000). Tokens in between receive exactly 0. The custom backward equals autograd through the spec's p_t formula (float64). |
+| 1. Exactness and non-fading memory | 200 random programs (27,857 tokens, 3,906 checks) agree with the string-level reference checker on every token, in check verdicts and in the full memory state after each token. This holds in float32 and float16, on cpu and mps. The gradient at a declaration is the same at distances 8 and 256 (ratio 1.000000), and tokens in between receive exactly 0. The custom backward equals autograd through the spec's p_t formula (float64). |
 | 2. Single-edit type direction (K = 5) | 200 / 200 declarations fixed by one gradient-directed edit. Blind, the model's best other type token at the same site, fixed 45 / 200. |
-| 3. Problem 14 | Smart: round 1 changes `+stock: Nat` to `U32`. Round 2 sees `consistent_uses[stock] = 1`, edits the call site (`6n` → `6`) and is valid in 2 rounds. See the notes below for the Upstream comparison. |
-| 4. JSON DAG on M4 Pro | Table below. Peak MPS allocated memory was 1.54 GB with the final code, which keeps only the last position's logits at prefill, and 1.72 GB before that change. |
-| Backends | On both HF/mps and llama.cpp/Metal, rewind + replay reproduces the original continuation exactly. An edited token's continuation matches a fresh decode of the edited prefix (12 / 12 tokens). |
+| 3. Problem 14 | Smart changes `+stock: Nat` to `U32` in round 1. In round 2 it sees `consistent_uses[stock] = 1` and edits the call site (`6n` → `6`), valid in 2 rounds. On the recorded trajectory, v1 Upstream flips `level` to `Nat` and ends invalid. |
+| 4a. JSON DAG on mps | 20 development tasks, Qwen3-0.6B-Base. Faithful: greedy 5, Best-of-N 5, pinned 9, pinned + mask 11, unpinned 5. Mean s / problem: pinned 5.5–6.1, pinned + mask 4.7–5.3, unpinned 6.1–6.8 (three runs). Peak MPS allocated 1.48–1.53 GB across three runs. |
+| 4b. llama.cpp parity | The same pinned regimes through llama.cpp (Metal, f16 GGUF). Valid, correct and faithful counts equal the mps run's. 19 of 20 problems match token for token; problem 4 is logged as a float16 tie. llama.cpp holds 1.62 GB of Metal buffers, 0.30 GB of CPU buffers and a 1.16 GB host logits array (required by `logits_all`). Mean s / problem (pinned / pinned + mask) over three runs: llama.cpp 7.27 / 6.55, 3.84 / 3.27 and 4.64 / 4.01, against mps 5.51 / 4.72, 6.08 / 5.25 and 5.68 / 4.89. llama.cpp was faster in two of the three runs. Other sessions' GPU jobs shared the machine, so the speed comparison is noisy. |
+| Backends | On Qwen3 (mps), Qwen3.5-0.8B (mps, hybrid, two rewind depths) and llama.cpp, rewind and replay reproduce the original continuation exactly. An edited token's continuation matches a fresh decode of the edited prefix on 12 of 12 tokens. Qwen3.5 checkpoints held at most 75 MiB in the test (about 19 MiB each). |
+| Cartridge edge cases | Two types sharing a first token are rejected. More than `n_slots` ids is a hard error, never an alias. |
 
-Gate 4: 20 prompts, Qwen3-0.6B-Base, float16 on mps. Every regime starts from the same greedy completion. Best-of-N samples at temperature 0.7, with its tokens matched per problem to the unpinned ttso run.
+On the parity gate: as first written, it required token-for-token identity and failed on problem 4. At the first differing token, the top two logits ("convert" vs "ref") differ by 0.016 in the mps run and 0.021 in llama.cpp, about one float16 step at that size. HuggingFace's own incremental decode and a fresh prefill disagree there too. The gate now requires equal counts and identical trajectories, except where the greedy completions diverge at a measured tie (top-two margin < 0.05 in both backends), and it logs each tie.
 
-Three two-regime runs are logged in `runs/gate4/`: `20261103-084404` (Gate 4 alone), `20261103-085145` (full suite) and `20261103-090307` (full suite, final code). Decoding is deterministic, so their outcomes are identical. Timings are given as the range across the three runs.
+## What the v0.1 Gate 4 run showed
 
-| | Valid | Correct | Faithful | Extra tokens | Mean s / problem | Max s |
-|---|---|---|---|---|---|---|
-| Greedy | 5 | 5 | 5 | 0 | 3.6–4.1 | |
-| Best-of-N | 6 | 6 | 5 | 2,670 | | |
-| ttso, spec routing | 15 | 11 | 5 | 2,824 | 6.6–7.8 | 11.6–14.7 |
-| ttso, `pin_inputs=True` | 14 | 10 | 9 | 2,352 | 5.9–7.2 | 15.1–18.7 |
-
-Column definitions:
-
-- **Correct:** valid, the expected output value, and the task's input names.
-- **Faithful:** correct, and every input keeps the type the task stated.
-
-Paired exact McNemar tests on n = 20:
-
-- Correct, ttso vs greedy: 6–0 (p = 0.031).
-- Correct, ttso vs Best-of-N: 6–1 (p = 0.125).
-- Faithful, pinned vs Best-of-N: 4–0 (p = 0.125).
-
-The 8.5 s latency target holds, but only with a modest margin: 6.6–7.8 s across four runs, including an earlier run of the spec-routing regime alone (`20261103-083639`, same outcomes, 7.63 s). A busy machine could push it past the target. Per-problem logs and summaries are in `runs/gate4/<timestamp>/`.
-
-## What Gate 4 shows
-
-With every declaration editable, the gradient of a failed reference check reaches only the declaration. Smart routing therefore retypes the input. All 6 of its extra correct programs changed an input type that the task had fixed, for example `boxes: Nat` became `U32`. The program is consistent, but the interface changed.
-
-`pin_inputs=True` freezes the input declarations as the prompt's contract. A failed reference then falls back to LocalOnly at the argument's key token. Banning `"ref"` there lets the model write `{"convert": "to_u32(boxes)"}`. That raised faithful programs from 5 to 9.
-
-Two kinds of error are out of reach for either regime: malformed JSON, and literals the schema does not define, such as `"47u32"`. The post-trained Qwen3-0.6B mostly makes structural errors of this kind (10 of 20 malformed arguments in a probe), so the base model is the default.
+With every declaration editable, the gradient of a failed reference check reaches only the declaration, so Smart routing retypes the input. In v0.1, all 6 extra correct programs changed an input type the task had fixed, for example `boxes: Nat` became `U32`. `pin_inputs=True` freezes those declarations and falls back to LocalOnly at the argument's key token: banning `"ref"` there lets the model write `{"convert": "to_u32(boxes)"}`. v0.2 makes that the default and confirms the effect on held-out tasks.
 
 ## Departures from the spec, and why
 
-- **Straight-through bridge.** The spec formula `onehot + softmax − sg(softmax)` is not bit-exact in float16, because the sum rounds before the subtraction. `deltanet._STProject` gathers `W[:, y_t]` forward and applies the softmax Jacobian to `Wᵀg` backward. That is the same gradient, and the Gate 1 test checks the equivalence.
-- **Replacement rule.** The pick is `argmax(−g + 1e-5·z)` over tokens with a constructive gradient (−g > 0) only. Otherwise the `1e-5·z` tie-break can outweigh a tiny gradient and choose a token of the wrong type. A site with no constructive token is exhausted, and routing moves on to the next candidate.
-- **Bans accumulate per position.** Smart keeps every class it has banned at a position, as B6 Patch 1 did. The spec bans only the current class, which would let a declaration oscillate U32 → Nat → U32 when nothing is rolled back.
-- **Type tokens.** Types are recognised by the tokenizer's real first piece: ` U` for `U32` (which tokenizes as U, 3, 2) and ` Nat`. Prefixes such as ` N` are not recognised; they led to `N32` in the study.
-- **Problem 14.** The spec's round-2 story (`6n` → `6`) is what happens if the model regenerates `catalog(6n, 38, 47)` after round 1. In the recorded run it regenerated `catalog(6, 38n, 47)`, so round 2 concerned `level`.
-  - Gate 3 replays both trajectories with a scripted LM.
-  - On the recorded one, v1 Upstream flips `level` to `Nat` and ends invalid, while Smart edits `38n` → `38`. This matches the study.
-  - On the spec's trajectory, v1 Upstream also succeeds, because stock's declaration was already tried, so it edits the latest flagged token instead. The Smart/Upstream split there depends on what the model regenerated.
+- **Straight-through bridge.** The spec formula `onehot + softmax − sg(softmax)` is not bit-exact in float16, because the sum rounds before the subtraction. `deltanet._STProject` gathers `W[:, y_t]` in the forward pass and applies the softmax Jacobian to `Wᵀg` in the backward pass. The gradient is the same, and Gate 1 tests the equivalence.
+- **Replacement rule.** The pick is `argmax(−g + 1e-5·z)` over tokens with a constructive gradient (−g > 0) only.
+  - Otherwise the `1e-5·z` tie-break can outweigh a tiny gradient and choose a token of the wrong type.
+  - A site with no constructive token is exhausted, and routing moves on to the next candidate site.
+- **Bans accumulate per position.** The spec bans only the current class. Without rollback, that would let a declaration oscillate U32 → Nat → U32.
+- **Type tokens.** Types are recognised by the tokenizer's real first piece: ` U` for `U32` (which tokenizes as U, 3, 2) and ` Nat`. Prefixes such as ` N` are not recognised; in the study they led to `N32`.
+- **Problem 14.** The spec's round-2 story (`6n` → `6`) assumes the model regenerates `catalog(6n, 38, 47)`. In the recorded run it regenerated `catalog(6, 38n, 47)`. Gate 3 replays both trajectories, and v1 Upstream fails only on the recorded one.
 - **JSON DAG schema.**
-  - The currency types are `USD` / `EUR`, not `Currency_USD` / `Currency_EUR`. Those share the first token `Currency`, so one token cannot identify the type.
-  - Workflows declare typed `inputs` and bind them in a `call`, which gives literals a declared slot to be checked against (`CHECK_CALL`).
-  - `out_type` must come before `args`.
-- **Peak memory.** torch 2.15 has no MPS peak counter, so peak memory is the maximum of `torch.mps.current_allocated_memory()`, sampled after every forward pass.
-- **KV-cache rewind.** In transformers 5.x, `DynamicCache.crop` takes a negative count of tokens to remove; the backend handles both conventions.
+  - The currency types are `USD` and `EUR`, because `Currency_USD` and `Currency_EUR` share their first token.
+  - Workflows declare typed `inputs` and bind them in a `call`.
+  - `out_type` precedes `args`.
+- **Forward-mask literals.** The v0.2 brief asked to restrict literals to `"<digits>"` or `"<digits>n"`. The mask allows all five literal forms the schema defines, because the USD tasks need `"7usd"`. A `"47u32"` therefore becomes the nearest legal form, `"47usd"`: a type error that repair then fixes.
+- **Peak memory.** On `mps`, peak memory is the highest `torch.mps.current_allocated_memory()` read after each forward pass, since torch 2.15 has no MPS peak counter. llama.cpp's figure is the Metal buffer total it logs at load.
+- **KV-cache rewind.** In transformers 5.x, `DynamicCache.crop` takes a negative count of tokens to remove. Hybrid linear-attention layers cannot be cropped at all, because their recurrent state is overwritten in place every step; hence the checkpoints.
+
+## License
+
+MIT, see [LICENSE](LICENSE).

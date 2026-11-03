@@ -1,0 +1,204 @@
+{
+ "faithful_wilson95": {
+  "greedy": [
+   0.1578,
+   0.3723
+  ],
+  "greedy_masked": [
+   0.1578,
+   0.3723
+  ],
+  "best_of_n": [
+   0.1578,
+   0.3723
+  ],
+  "best_of_n_masked": [
+   0.1578,
+   0.3723
+  ],
+  "ttso_pinned": [
+   0.3157,
+   0.559
+  ],
+  "ttso_pinned_masked": [
+   0.3773,
+   0.6227
+  ],
+  "ttso_unpinned": [
+   0.1578,
+   0.3723
+  ]
+ },
+ "counts": {
+  "greedy": {
+   "valid": 23,
+   "correct": 15,
+   "faithful": 15
+  },
+  "greedy_masked": {
+   "valid": 29,
+   "correct": 15,
+   "faithful": 15
+  },
+  "best_of_n": {
+   "valid": 23,
+   "correct": 15,
+   "faithful": 15
+  },
+  "best_of_n_masked": {
+   "valid": 30,
+   "correct": 15,
+   "faithful": 15
+  },
+  "ttso_pinned": {
+   "valid": 44,
+   "correct": 27,
+   "faithful": 26
+  },
+  "ttso_pinned_masked": {
+   "valid": 51,
+   "correct": 31,
+   "faithful": 30
+  },
+  "ttso_unpinned": {
+   "valid": 50,
+   "correct": 35,
+   "faithful": 15
+  }
+ },
+ "primary_faithful": {
+  "H1": {
+   "only_first": 11,
+   "only_second": 0,
+   "p": 0.0009765625,
+   "pair": [
+    "ttso_pinned",
+    "greedy"
+   ],
+   "p_holm": 0.001953125
+  },
+  "H2": {
+   "only_first": 11,
+   "only_second": 0,
+   "p": 0.0009765625,
+   "pair": [
+    "ttso_pinned",
+    "best_of_n"
+   ],
+   "p_holm": 0.001953125
+  },
+  "H3": {
+   "only_first": 15,
+   "only_second": 0,
+   "p": 6.103515625e-05,
+   "pair": [
+    "ttso_pinned_masked",
+    "greedy_masked"
+   ],
+   "p_holm": 0.000244140625
+  },
+  "H4": {
+   "only_first": 15,
+   "only_second": 0,
+   "p": 6.103515625e-05,
+   "pair": [
+    "ttso_pinned_masked",
+    "best_of_n_masked"
+   ],
+   "p_holm": 0.000244140625
+  }
+ },
+ "secondary": {
+  "mask alone (greedy_masked vs greedy)": {
+   "valid": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125
+   },
+   "correct": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0
+   },
+   "faithful": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0
+   }
+  },
+  "mask + repair vs repair (ttso_pinned_masked vs ttso_pinned)": {
+   "valid": {
+    "only_first": 7,
+    "only_second": 0,
+    "p": 0.015625
+   },
+   "correct": {
+    "only_first": 4,
+    "only_second": 0,
+    "p": 0.125
+   },
+   "faithful": {
+    "only_first": 4,
+    "only_second": 0,
+    "p": 0.125
+   }
+  },
+  "pinned vs unpinned routing": {
+   "valid": {
+    "only_first": 3,
+    "only_second": 9,
+    "p": 0.14599609375
+   },
+   "correct": {
+    "only_first": 4,
+    "only_second": 12,
+    "p": 0.076812744140625
+   },
+   "faithful": {
+    "only_first": 11,
+    "only_second": 0,
+    "p": 0.0009765625
+   }
+  },
+  "H1 on valid": {
+   "only_first": 21,
+   "only_second": 0,
+   "p": 9.5367431640625e-07
+  },
+  "H1 on correct": {
+   "only_first": 12,
+   "only_second": 0,
+   "p": 0.00048828125
+  },
+  "H2 on valid": {
+   "only_first": 21,
+   "only_second": 0,
+   "p": 9.5367431640625e-07
+  },
+  "H2 on correct": {
+   "only_first": 12,
+   "only_second": 0,
+   "p": 0.00048828125
+  },
+  "H3 on valid": {
+   "only_first": 22,
+   "only_second": 0,
+   "p": 4.76837158203125e-07
+  },
+  "H3 on correct": {
+   "only_first": 16,
+   "only_second": 0,
+   "p": 3.0517578125e-05
+  },
+  "H4 on valid": {
+   "only_first": 22,
+   "only_second": 1,
+   "p": 5.7220458984375e-06
+  },
+  "H4 on correct": {
+   "only_first": 16,
+   "only_second": 0,
+   "p": 3.0517578125e-05
+  }
+ }
+}

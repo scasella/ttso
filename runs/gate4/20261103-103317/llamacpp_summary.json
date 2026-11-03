@@ -1,0 +1,63 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy",
+  "greedy_masked",
+  "ttso_pinned",
+  "ttso_pinned_masked"
+ ],
+ "greedy": {
+  "valid": 5,
+  "correct": 5,
+  "faithful": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "latency_mean_s": 4.2134
+ },
+ "greedy_masked": {
+  "valid": 8,
+  "correct": 5,
+  "faithful": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "latency_mean_s": 4.37575
+ },
+ "ttso_pinned": {
+  "valid": 14,
+  "correct": 10,
+  "faithful": 9,
+  "faithful_wilson95": [
+   0.2582,
+   0.6579
+  ],
+  "extra_tokens_total": 2435,
+  "latency_mean_s": 7.26665,
+  "latency_max_s": 14.846,
+  "same_greedy": true
+ },
+ "ttso_pinned_masked": {
+  "valid": 17,
+  "correct": 12,
+  "faithful": 11,
+  "faithful_wilson95": [
+   0.3421,
+   0.7418
+  ],
+  "extra_tokens_total": 1644,
+  "latency_mean_s": 6.551550000000001,
+  "latency_max_s": 16.433,
+  "same_greedy": true
+ },
+ "peak_mps_allocated_gb": 1.742471168,
+ "model": "qwen3-0.6b-base-f16.gguf",
+ "backend": "llama.cpp",
+ "buffers": {
+  "metal_mib": 1661.75,
+  "cpu_mib": 309.34,
+  "scores_mib": 1187.0
+ }
+}

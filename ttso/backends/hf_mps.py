@@ -129,7 +129,9 @@ class HuggingFaceMPSBackend(Backend):
     @torch.inference_mode()
     def rewind_kv_cache(self, kv_cache, target_seq_len):
         cur = kv_cache.get_seq_length()
-        if target_seq_len >= cur:
+        if target_seq_len > cur:
+            raise ValueError(f"cannot rewind forward: cache holds {cur} positions, asked for {target_seq_len}")
+        if target_seq_len == cur:
             return kv_cache
         if not self.hybrid:
             try:

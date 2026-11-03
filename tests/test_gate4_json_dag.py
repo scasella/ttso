@@ -13,9 +13,13 @@ test_gate4_json_dag_mps: all 20 problems run and are logged; every ttso regime's
 problem (greedy + repair) < 8.5 s; peak MPS allocated memory < 3.5 GB.
 
 test_gate4_llamacpp_parity: the pinned regimes again through LlamaCppBackend (Metal, an f16 GGUF of
-the same model). Per problem, the greedy completion, the repair trajectory (round, t*, old, new),
-the final completion and its valid / faithful verdicts must match the HuggingFace run. Logs the
-head-to-head latency and memory.
+the same model). Valid, correct and faithful counts must equal the HuggingFace run's. Per problem,
+the greedy completion, the repair trajectory (round, t*, old, new) and the final completion must
+match, with one exception: a problem whose greedy completions already differ, at a token where both
+backends' top-two logits are within TIE (a float16 tie, about 1-3 ULP at logit ~25). Such ties are
+logged. (The strict criterion failed on 1 of 20 problems in the first v0.2 run: a 0.016 margin
+between "convert" and "ref", where even HF's incremental decode and a fresh prefill disagree.)
+Logs the head-to-head latency and memory.
 """
 
 import json
@@ -31,6 +35,7 @@ ROOT = Path(__file__).resolve().parents[1]
 GGUF = Path(os.environ.get("TTSO_GATE4_GGUF", ROOT / "models" / "qwen3-0.6b-base-f16.gguf"))
 OUT = ROOT / "runs" / "gate4"
 PARITY = ("ttso_pinned", "ttso_pinned_masked")
+TIE = 0.05
 
 
 def _regimes(be, names=None):
@@ -78,11 +83,11 @@ def hf_run():
         for r in rows:
             f.write(json.dumps(r) + "\n")
     (run_dir / "summary.json").write_text(json.dumps(s, indent=1))
-    return rows, s, run_dir
+    return rows, s, run_dir, be
 
 
 def test_gate4_json_dag_mps(hf_run):
-    rows, s, run_dir = hf_run
+    rows, s, run_dir, _ = hf_run
     print(f"\n[gate4] {MODEL} on mps/fp16, {s['n']} prompts -> {run_dir}")
     print(_table(s, s["arms"]))
     print(f"  peak MPS allocated {s['peak_mps_allocated_gb']:.2f} GB")
@@ -100,7 +105,7 @@ def test_gate4_llamacpp_parity(hf_run):
     from ttso.backends.llamacpp import LlamaCppBackend
     from ttso.engine import benchmark
 
-    hf_rows, hf_s, run_dir = hf_run
+    hf_rows, hf_s, run_dir, hf_be = hf_run
     from transformers import AutoTokenizer
     be = LlamaCppBackend(str(GGUF), n_ctx=2048)
     be.special_ids = AutoTokenizer.from_pretrained(MODEL).all_special_ids  # same specials as the HF run
@@ -129,6 +134,26 @@ def test_gate4_llamacpp_parity(hf_run):
           f"host logits array {be.buffers['scores_mib'] / 1024:.2f} GB")
     print(f"  per-problem mismatches (problem, regime): {mismatch}")
     for k in PARITY:
-        for f in ("valid", "faithful"):
+        for f in ("valid", "correct", "faithful"):
             assert s[k][f] == hf_s[k][f], (k, f, s[k][f], hf_s[k][f])
-    assert not mismatch
+    tasks = benchmark.make_tasks(20, seed=0)
+    unexplained = []
+    for i, k in mismatch:
+        g = "greedy_masked" if k.endswith("masked") else "greedy"
+        a, b = hf_be.encode(hf_rows[i][g]["text"]), hf_be.encode(rows[i][g]["text"])
+        j = next((n for n, (x, y) in enumerate(zip(a, b)) if x != y), None)
+        if j is None:  # same greedy completion: the divergence is in repair itself
+            unexplained.append((i, k, "repair diverged"))
+            continue
+        ctx = hf_be.encode(benchmark.prompt_of(tasks[i])) + a[:j]
+        margins = []
+        for backend in (hf_be, be):
+            _, z, _ = backend.generate_from(ctx, None, 1)
+            top = torch.topk(z[0], 2).values
+            margins.append(float(top[0] - top[1]))
+        tie = max(margins) < TIE
+        print(f"  problem {i} {k}: greedy diverges at token {j} ({hf_be.decode([a[j]])!r} vs {hf_be.decode([b[j]])!r}), "
+              f"top-two margin mps {margins[0]:.4f}, llama.cpp {margins[1]:.4f} -> {'float16 tie' if tie else 'NOT a tie'}")
+        if not tie:
+            unexplained.append((i, k, margins))
+    assert not unexplained, unexplained

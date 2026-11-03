@@ -114,3 +114,11 @@ These come from the frozen code, recorded in `runs/v0.2/dev/seed0_base.json` (pr
   closest legal form, `"47usd"`, which is a type error left for repair.
 - Timings were measured while three unrelated GPU jobs shared the machine, so they are not
   comparable with v0.1.
+
+## Post-run record (added after the held-out runs; nothing above was changed)
+
+- **Runs.** Both held-out runs completed on the frozen code (`835f4cb` in github.com/scasella/ttso), with no reruns: `runs/v0.2/base`, `runs/v0.2/post`.
+- **Bug found after the freeze.** A code review found a bug in `pick()` that could only affect masked sampling. If the first draw was illegal and every legal token's sampling probability had underflowed to 0, it returned the illegal token.
+  - The fix changes only that case. Every draw uses a per-task seeded generator, so replaying the masked Best-of-N arm with the fix shows whether the case ever occurred.
+  - The replay reproduced all 31 base and 15 post-trained outputs exactly (`bon_masked_recheck.json`), so the reported numbers stand.
+- **Mask integrity.** No masked output in either run left the schema.

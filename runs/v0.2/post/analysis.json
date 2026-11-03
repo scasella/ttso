@@ -1,0 +1,178 @@
+{
+ "faithful_wilson95": {
+  "greedy": [
+   0.0807,
+   0.416
+  ],
+  "greedy_masked": [
+   0.0807,
+   0.416
+  ],
+  "best_of_n": [
+   0.0807,
+   0.416
+  ],
+  "best_of_n_masked": [
+   0.0807,
+   0.416
+  ],
+  "ttso_pinned": [
+   0.0807,
+   0.416
+  ],
+  "ttso_pinned_masked": [
+   0.1119,
+   0.4687
+  ]
+ },
+ "counts": {
+  "greedy": {
+   "valid": 4,
+   "correct": 4,
+   "faithful": 4
+  },
+  "greedy_masked": {
+   "valid": 5,
+   "correct": 4,
+   "faithful": 4
+  },
+  "best_of_n": {
+   "valid": 4,
+   "correct": 4,
+   "faithful": 4
+  },
+  "best_of_n_masked": {
+   "valid": 5,
+   "correct": 4,
+   "faithful": 4
+  },
+  "ttso_pinned": {
+   "valid": 4,
+   "correct": 4,
+   "faithful": 4
+  },
+  "ttso_pinned_masked": {
+   "valid": 12,
+   "correct": 5,
+   "faithful": 5
+  }
+ },
+ "primary_faithful": {
+  "H1": {
+   "only_first": 0,
+   "only_second": 0,
+   "p": 1.0,
+   "pair": [
+    "ttso_pinned",
+    "greedy"
+   ],
+   "p_holm": 1.0
+  },
+  "H2": {
+   "only_first": 0,
+   "only_second": 0,
+   "p": 1.0,
+   "pair": [
+    "ttso_pinned",
+    "best_of_n"
+   ],
+   "p_holm": 1.0
+  },
+  "H3": {
+   "only_first": 1,
+   "only_second": 0,
+   "p": 1.0,
+   "pair": [
+    "ttso_pinned_masked",
+    "greedy_masked"
+   ],
+   "p_holm": 1.0
+  },
+  "H4": {
+   "only_first": 1,
+   "only_second": 0,
+   "p": 1.0,
+   "pair": [
+    "ttso_pinned_masked",
+    "best_of_n_masked"
+   ],
+   "p_holm": 1.0
+  }
+ },
+ "secondary": {
+  "mask alone (greedy_masked vs greedy)": {
+   "valid": {
+    "only_first": 1,
+    "only_second": 0,
+    "p": 1.0
+   },
+   "correct": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0
+   },
+   "faithful": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0
+   }
+  },
+  "mask + repair vs repair (ttso_pinned_masked vs ttso_pinned)": {
+   "valid": {
+    "only_first": 8,
+    "only_second": 0,
+    "p": 0.0078125
+   },
+   "correct": {
+    "only_first": 1,
+    "only_second": 0,
+    "p": 1.0
+   },
+   "faithful": {
+    "only_first": 1,
+    "only_second": 0,
+    "p": 1.0
+   }
+  },
+  "H1 on valid": {
+   "only_first": 0,
+   "only_second": 0,
+   "p": 1.0
+  },
+  "H1 on correct": {
+   "only_first": 0,
+   "only_second": 0,
+   "p": 1.0
+  },
+  "H2 on valid": {
+   "only_first": 0,
+   "only_second": 0,
+   "p": 1.0
+  },
+  "H2 on correct": {
+   "only_first": 0,
+   "only_second": 0,
+   "p": 1.0
+  },
+  "H3 on valid": {
+   "only_first": 7,
+   "only_second": 0,
+   "p": 0.015625
+  },
+  "H3 on correct": {
+   "only_first": 1,
+   "only_second": 0,
+   "p": 1.0
+  },
+  "H4 on valid": {
+   "only_first": 7,
+   "only_second": 0,
+   "p": 0.015625
+  },
+  "H4 on correct": {
+   "only_first": 1,
+   "only_second": 0,
+   "p": 1.0
+  }
+ }
+}

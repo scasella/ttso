@@ -91,13 +91,13 @@ def pick(z, temperature=0.0, generator=None, accept=None):
     if sampling:
         p = p * cand
         for _ in range(int(cand.sum())):
-            if float(p.sum()) <= 0:
+            if float(p.sum()) <= 0:  # every remaining candidate underflowed: fall back to greedy
                 break
             v = int(torch.multinomial(p, 1, generator=generator))
             if accept(v):
                 return v
             p[v] = 0.0
-        return v
+            cand[v] = False
     s = zf.masked_fill(~cand, float("-inf"))
     for v in torch.argsort(s, descending=True)[:int(cand.sum())].tolist():
         if accept(v):
