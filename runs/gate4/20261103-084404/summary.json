@@ -1,0 +1,94 @@
+{
+ "n": 20,
+ "regimes": [
+  "ttso",
+  "ttso_pinned"
+ ],
+ "greedy": {
+  "valid": 5,
+  "correct": 5,
+  "faithful": 5,
+  "latency_mean_s": 3.56215
+ },
+ "best_of_n": {
+  "valid": 6,
+  "correct": 6,
+  "faithful": 5,
+  "tokens_total": 2670
+ },
+ "ttso": {
+  "valid": 15,
+  "correct": 11,
+  "faithful": 5,
+  "extra_tokens_total": 2824,
+  "latency_mean_s": 6.691199999999999,
+  "latency_max_s": 12.213
+ },
+ "ttso_pinned": {
+  "valid": 14,
+  "correct": 10,
+  "faithful": 9,
+  "extra_tokens_total": 2352,
+  "latency_mean_s": 5.94365,
+  "latency_max_s": 15.534
+ },
+ "mcnemar ttso": {
+  "correct": {
+   "vs greedy": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125
+   },
+   "vs best_of_n": {
+    "only_first": 6,
+    "only_second": 1,
+    "p": 0.125
+   }
+  },
+  "faithful": {
+   "vs greedy": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0
+   },
+   "vs best_of_n": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0
+   }
+  }
+ },
+ "mcnemar ttso_pinned": {
+  "correct": {
+   "vs greedy": {
+    "only_first": 5,
+    "only_second": 0,
+    "p": 0.0625
+   },
+   "vs best_of_n": {
+    "only_first": 5,
+    "only_second": 1,
+    "p": 0.21875
+   }
+  },
+  "faithful": {
+   "vs greedy": {
+    "only_first": 4,
+    "only_second": 0,
+    "p": 0.125
+   },
+   "vs best_of_n": {
+    "only_first": 4,
+    "only_second": 0,
+    "p": 0.125
+   }
+  }
+ },
+ "repaired_problems": 15,
+ "peak_mps_allocated_gb": 1.716131584,
+ "model": "Qwen/Qwen3-0.6B-Base",
+ "device": "mps",
+ "dtype": "float16",
+ "torch": "2.15.0",
+ "mps": true
+}

@@ -1,0 +1,45 @@
+{
+ "n": 20,
+ "greedy": {
+  "valid": 5,
+  "correct": 5,
+  "faithful": 5
+ },
+ "best_of_n": {
+  "valid": 6,
+  "correct": 6,
+  "faithful": 5,
+  "tokens_total": 2670
+ },
+ "ttso": {
+  "valid": 15,
+  "correct": 11,
+  "faithful": 5,
+  "extra_tokens_total": 2824,
+  "repaired_problems": 15
+ },
+ "mcnemar_correct": {
+  "ttso vs greedy": {
+   "only_first": 6,
+   "only_second": 0,
+   "p": 0.03125
+  },
+  "ttso vs best_of_n": {
+   "only_first": 6,
+   "only_second": 1,
+   "p": 0.125
+  }
+ },
+ "latency_s": {
+  "mean_ttso_total": 7.633,
+  "max_ttso_total": 11.985,
+  "mean_greedy": 4.0485,
+  "mean_repair_only_on_repaired": 4.7792
+ },
+ "peak_mps_allocated_gb": 1.68506752,
+ "model": "Qwen/Qwen3-0.6B-Base",
+ "device": "mps",
+ "dtype": "float16",
+ "torch": "2.15.0",
+ "mps": true
+}
