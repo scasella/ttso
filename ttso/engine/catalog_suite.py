@@ -142,7 +142,8 @@ def faithful_types(task, text):
 
 
 class CatalogSuite:
-    """Chat prompts (thinking off, as in the study) and the catalog outcomes for benchmark.run."""
+    """Chat prompts (thinking off, as in the study) and the catalog outcomes for benchmark.run.
+    The prompt uses the backend's HuggingFace tokenizer (backend.tok) for the chat template."""
 
     def prompt_ids(self, backend, task):
         text = backend.tok.apply_chat_template(messages(task), add_generation_prompt=True, tokenize=False,

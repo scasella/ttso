@@ -1,0 +1,112 @@
+{
+ "n": 60,
+ "arms": [
+  "greedy",
+  "greedy_masked",
+  "best_of_n",
+  "best_of_n_masked",
+  "ttso_pinned",
+  "ttso_pinned_masked",
+  "ttso_unpinned"
+ ],
+ "greedy": {
+  "valid": 16,
+  "correct": 10,
+  "faithful": 8,
+  "faithful_wilson95": [
+   0.0691,
+   0.2417
+  ],
+  "latency_mean_s": 5.603716666666667
+ },
+ "greedy_masked": {
+  "valid": 20,
+  "correct": 11,
+  "faithful": 9,
+  "faithful_wilson95": [
+   0.081,
+   0.2611
+  ],
+  "latency_mean_s": 5.451383333333334
+ },
+ "best_of_n": {
+  "valid": 18,
+  "correct": 10,
+  "faithful": 8,
+  "faithful_wilson95": [
+   0.0691,
+   0.2417
+  ],
+  "tokens_total": 8274
+ },
+ "best_of_n_masked": {
+  "valid": 23,
+  "correct": 11,
+  "faithful": 9,
+  "faithful_wilson95": [
+   0.081,
+   0.2611
+  ],
+  "tokens_total": 7315
+ },
+ "ttso_pinned": {
+  "valid": 31,
+  "correct": 19,
+  "faithful": 14,
+  "faithful_wilson95": [
+   0.1444,
+   0.3544
+  ],
+  "extra_tokens_total": 8450,
+  "latency_mean_s": 11.248116666666668,
+  "latency_max_s": 21.321,
+  "same_greedy": true,
+  "rewinds": 114,
+  "replayed_tokens": 982,
+  "replayed_per_rewind": 8.614035087719298
+ },
+ "ttso_pinned_masked": {
+  "valid": 32,
+  "correct": 22,
+  "faithful": 15,
+  "faithful_wilson95": [
+   0.1578,
+   0.3723
+  ],
+  "extra_tokens_total": 7630,
+  "latency_mean_s": 10.402999999999999,
+  "latency_max_s": 22.013,
+  "same_greedy": true,
+  "rewinds": 102,
+  "replayed_tokens": 833,
+  "replayed_per_rewind": 8.166666666666666
+ },
+ "ttso_unpinned": {
+  "valid": 46,
+  "correct": 17,
+  "faithful": 11,
+  "faithful_wilson95": [
+   0.1056,
+   0.2992
+  ],
+  "extra_tokens_total": 9371,
+  "latency_mean_s": 11.648133333333334,
+  "latency_max_s": 24.716,
+  "same_greedy": true,
+  "rewinds": 107,
+  "replayed_tokens": 868,
+  "replayed_per_rewind": 8.11214953271028
+ },
+ "peak_mps_allocated_gb": 2.863250432,
+ "ckpt_peak_mib": 301.5,
+ "model": "Qwen/Qwen3.5-0.8B",
+ "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+ "dtype": "float16",
+ "split": "heldout",
+ "n_tasks": 60,
+ "wall_s": 2339.6,
+ "max_new_tokens": 320,
+ "k_max": 3,
+ "torch": "2.15.0",
+ "mps": true
+}

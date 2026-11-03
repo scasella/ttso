@@ -160,10 +160,12 @@ def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperat
     (`same_greedy` records whether later regimes reproduced it). With share_greedy, later regimes
     with the same mask setting reuse that decode (tokens, logits and a copy of its KV cache)
     instead of re-decoding, and their latency counts the shared decode's time; this assumes those
-    regimes' cartridges constrain decoding alike (backend.fork_cache must be supported). bon: {arm: regime},
-    a Best-of-N arm decoded with that regime's cartridge and matched per problem to its extra
-    tokens (default: {"best_of_n": first regime}). When the regime spent nothing (greedy valid),
-    the arm is greedy. suite: prompts and outcomes (default: the typed JSON DAG tasks).
+    regimes' cartridges constrain decoding alike (backend.fork_cache must be supported). A regime
+    that reuses the decode records same_greedy=True by construction and shared_greedy=True.
+    bon: {arm: regime}, a Best-of-N arm decoded with that regime's cartridge and matched per
+    problem to its extra tokens (default: {"best_of_n": first regime}). When the regime spent
+    nothing (greedy valid), the arm is greedy. suite: prompts and outcomes (default: the typed
+    JSON DAG tasks).
     """
     suite = suite or JSONDAGSuite()
     loops = {k: RepairLoop(backend, c, policy=p, k_max=k_max, max_new_tokens=max_new_tokens)

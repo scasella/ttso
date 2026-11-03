@@ -167,4 +167,4 @@ def test_incremental_mask_model_gate(hf_run):
           f"{ia * 1e6 / ntok:.0f} us/token ({la / ia:.1f}x), candidates() {lc * 1e3 / ntok:.2f} vs "
           f"{ic * 1e3 / ntok:.2f} ms/token ({lc / ic:.1f}x)")
     assert not diff, diff
-    assert mask(rows, k) < mask(leg_rows, k)
+    assert ia < la and ic < lc  # the same fixed CPU workload, run back to back

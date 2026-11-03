@@ -1,0 +1,35 @@
+0 {'reparse': 5.38, 'incremental': 4.78} True
+1 {'incremental': 4.25, 'reparse': 4.69} True
+2 {'reparse': 2.49, 'incremental': 2.43} True
+3 {'incremental': 5.9, 'reparse': 6.05} True
+4 {'reparse': 3.77, 'incremental': 3.71} True
+5 {'incremental': 8.32, 'reparse': 9.24} True
+6 {'reparse': 3.32, 'incremental': 2.68} True
+7 {'incremental': 6.74, 'reparse': 6.92} True
+8 {'reparse': 6.22, 'incremental': 5.39} True
+9 {'incremental': 6.58, 'reparse': 6.52} True
+10 {'reparse': 2.71, 'incremental': 2.77} True
+11 {'incremental': 8.25, 'reparse': 9.05} True
+12 {'reparse': 4.88, 'incremental': 5.05} True
+13 {'incremental': 2.5, 'reparse': 2.69} True
+14 {'reparse': 2.99, 'incremental': 2.59} True
+15 {'incremental': 5.91, 'reparse': 5.71} True
+16 {'reparse': 4.0, 'incremental': 3.64} True
+17 {'incremental': 2.77, 'reparse': 2.77} True
+18 {'reparse': 2.45, 'incremental': 2.66} True
+19 {'incremental': 5.85, 'reparse': 5.92} True
+{'nodes': 1, 'tokens': 131, 'reparse': {'accept_us_per_token': 31.142519455481295, 'candidates_ms_per_token': 3.4679973965425415}, 'incremental': {'accept_us_per_token': 6.581970000859947, 'candidates_ms_per_token': 0.3786777861092865}}
+{'nodes': 4, 'tokens': 272, 'reparse': {'accept_us_per_token': 63.19393041314255, 'candidates_ms_per_token': 4.556025437683703}, 'incremental': {'accept_us_per_token': 4.516360337113249, 'candidates_ms_per_token': 0.06914076076260672}}
+{'nodes': 16, 'tokens': 844, 'reparse': {'accept_us_per_token': 166.4986815550464, 'candidates_ms_per_token': 14.431574662236422}, 'incremental': {'accept_us_per_token': 7.402312549292352, 'candidates_ms_per_token': 0.08777563387894412}}
+{'nodes': 64, 'tokens': 3200, 'reparse': {'accept_us_per_token': 513.7704930848486, 'candidates_ms_per_token': 55.61354143464996}, 'incremental': {'accept_us_per_token': 13.678279428859241, 'candidates_ms_per_token': 0.09800720599741908}}
+{
+ "identical": 20,
+ "latency_mean_s": {
+  "reparse": 4.8891448974609375,
+  "incremental": 4.638805115222931
+ },
+ "mask_mean_s": {
+  "reparse": 0.03415651324903592,
+  "incremental": 0.00651491967291804
+ }
+}

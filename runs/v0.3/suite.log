@@ -1,0 +1,145 @@
+W1103 15:06:58.411000 45567 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/311 [00:00<03:24,  1.52it/s]
+Loading weights:  72%|███████▏  | 224/311 [00:00<00:00, 395.50it/s]
+Loading weights: 100%|██████████| 311/311 [00:00<00:00, 346.69it/s]
+
+[backend] HuggingFaceMPSBackend: rewind replay exact; edited vs fresh decode agree 100%
+.
+Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/320 [00:00<04:10,  1.27it/s]
+Loading weights: 100%|██████████| 320/320 [00:00<00:00, 405.50it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+
+[backend] HuggingFaceMPSBackend: rewind replay exact; edited vs fresh decode agree 100%
+[backend] Qwen/Qwen3.5-0.8B@2fc06364: checkpoints held at most 38 MiB
+.
+[backend] HuggingFaceMPSBackend: rewind replay exact; edited vs fresh decode agree 100%
+[backend] Qwen/Qwen3.5-0.8B@2fc06364: checkpoints held at most 75 MiB
+.
+[backend] LlamaCppBackend: rewind replay exact; edited vs fresh decode agree 100%
+......
+[gate1] cpu torch.float32: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (0.2s)
+.
+[gate1] cpu torch.float16: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (0.2s)
+.
+[gate1] mps torch.float32: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (1.7s)
+.
+[gate1] mps torch.float16: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (1.6s)
+.
+[gate1] cpu torch.float32: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] cpu torch.float16: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] mps torch.float32: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] mps torch.float16: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] straight-through bridge == spec formula on 20 failing programs
+.
+[gate2] K=5: gradient-directed single edit fixed 200/200 targeted declarations (Blind next-best type token: 45/200)
+..
+[gate3] Smart, spec account: valid=True rounds=2 extra=66
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case B decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=55 (call arg), flagged [8, 55], uses=1 -> case A call t*=55 'n'->',' valid_after=True
+.
+[gate3] Smart, recorded trajectory: valid=True rounds=2 extra=62
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case B decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=59 (call arg), flagged [15, 59], uses=1 -> case A call t*=59 'n'->',' valid_after=True
+
+[gate3] Upstream (v1), recorded trajectory: valid=False rounds=3 extra=106
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case A decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=59 (call arg), flagged [15, 59], uses=1 -> case A decl t*=15 ' U'->' Nat' valid_after=False
+   round 3: first failure t=35 (group operand), flagged [15], uses=0 -> case C local t*=35 ' level'->'!' valid_after=False
+.
+[gate3] Upstream (v1), spec account: valid=True rounds=2 extra=66
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case A decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=55 (call arg), flagged [8, 55], uses=1 -> case A flagged t*=55 'n'->',' valid_after=True
+.
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]
+Loading weights:   0%|          | 1/310 [00:01<06:47,  1.32s/it]
+Loading weights:  89%|████████▊ | 275/310 [00:01<00:00, 267.69it/s]
+Loading weights: 100%|██████████| 310/310 [00:01<00:00, 203.46it/s]
+[ 0] greedy x | greedy_masked x | ttso_pinned v r=2 +87 | ttso_pinned_masked v r=2 +87 | ttso_unpinned x r=3 +309 | best_of_n x | best_of_n_masked x
+[ 1] greedy x | greedy_masked v | ttso_pinned x r=3 +273 | ttso_pinned_masked v r=0 +0 | ttso_unpinned x r=3 +273 | best_of_n x | best_of_n_masked v
+[ 2] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +134 | ttso_pinned_masked F r=3 +119 | ttso_unpinned C r=3 +176 | best_of_n x | best_of_n_masked x
+[ 4] greedy x | greedy_masked x | ttso_pinned v r=2 +22 | ttso_pinned_masked F r=1 +9 | ttso_unpinned v r=2 +22 | best_of_n x | best_of_n_masked x
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +242 | ttso_pinned_masked x r=3 +242 | ttso_unpinned x r=3 +280 | best_of_n x | best_of_n_masked x
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 7] greedy x | greedy_masked x | ttso_pinned F r=3 +176 | ttso_pinned_masked F r=3 +172 | ttso_unpinned C r=3 +175 | best_of_n x | best_of_n_masked x
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +559 | ttso_pinned_masked v r=2 +113 | ttso_unpinned v r=3 +221 | best_of_n x | best_of_n_masked x
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +209 | ttso_pinned_masked x r=3 +209 | ttso_unpinned x r=3 +287 | best_of_n x | best_of_n_masked x
+[10] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +236 | ttso_pinned_masked x r=3 +238 | ttso_unpinned C r=3 +264 | best_of_n x | best_of_n_masked x
+[12] greedy x | greedy_masked x | ttso_pinned F r=2 +87 | ttso_pinned_masked F r=2 +87 | ttso_unpinned C r=1 +107 | best_of_n x | best_of_n_masked x
+[13] greedy x | greedy_masked v | ttso_pinned v r=1 +10 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=1 +10 | best_of_n x | best_of_n_masked v
+[14] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[15] greedy x | greedy_masked x | ttso_pinned F r=3 +116 | ttso_pinned_masked F r=3 +116 | ttso_unpinned x r=3 +275 | best_of_n x | best_of_n_masked x
+[16] greedy x | greedy_masked x | ttso_pinned C r=1 +48 | ttso_pinned_masked C r=1 +48 | ttso_unpinned C r=2 +231 | best_of_n x | best_of_n_masked x
+[17] greedy x | greedy_masked v | ttso_pinned v r=2 +11 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=2 +11 | best_of_n x | best_of_n_masked v
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[19] greedy x | greedy_masked x | ttso_pinned F r=3 +142 | ttso_pinned_masked F r=3 +123 | ttso_unpinned C r=3 +183 | best_of_n x | best_of_n_masked x
+
+[gate4] Qwen/Qwen3-0.6B-Base on mps/fp16, 20 prompts -> runs/gate4/20261103-151617
+                       valid correct faithful  faithful 95% CI extra tok mean s
+  greedy                   5       5        5        0.11-0.47         0   4.16
+  greedy_masked            8       5        5        0.11-0.47         0   4.22
+  best_of_n                5       5        5        0.11-0.47      2352 
+  best_of_n_masked         8       5        5        0.11-0.47      1563 
+  ttso_pinned             14      10        9        0.26-0.66      2352   7.16
+  ttso_pinned_masked      17      12       11        0.34-0.74      1563   6.22
+  ttso_unpinned           15      11        5        0.11-0.47      2824   7.82
+  peak MPS allocated 1.49 GB
+.[ 0] greedy x | greedy_masked x | ttso_pinned v r=2 +87 | ttso_pinned_masked v r=2 +87
+[ 1] greedy x | greedy_masked v | ttso_pinned x r=3 +273 | ttso_pinned_masked v r=0 +0
+[ 2] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +134 | ttso_pinned_masked F r=3 +119
+[ 4] greedy x | greedy_masked x | ttso_pinned v r=3 +105 | ttso_pinned_masked F r=2 +90
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +242 | ttso_pinned_masked x r=3 +242
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[ 7] greedy x | greedy_masked x | ttso_pinned F r=3 +176 | ttso_pinned_masked F r=3 +172
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +559 | ttso_pinned_masked v r=2 +113
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +209 | ttso_pinned_masked x r=3 +209
+[10] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +236 | ttso_pinned_masked x r=3 +238
+[12] greedy x | greedy_masked x | ttso_pinned F r=2 +87 | ttso_pinned_masked F r=2 +87
+[13] greedy x | greedy_masked v | ttso_pinned v r=1 +10 | ttso_pinned_masked v r=0 +0
+[14] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[15] greedy x | greedy_masked x | ttso_pinned F r=3 +116 | ttso_pinned_masked F r=3 +116
+[16] greedy x | greedy_masked x | ttso_pinned C r=1 +48 | ttso_pinned_masked C r=1 +48
+[17] greedy x | greedy_masked v | ttso_pinned v r=2 +11 | ttso_pinned_masked v r=0 +0
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[19] greedy x | greedy_masked x | ttso_pinned F r=3 +142 | ttso_pinned_masked F r=3 +123
+
+[gate4] llama.cpp (qwen3-0.6b-base-f16.gguf) vs HuggingFace mps, 20 prompts
+                       valid correct faithful  faithful 95% CI extra tok mean s
+  greedy                   5       5        5        0.11-0.47         0   2.88
+  greedy_masked            8       5        5        0.11-0.47         0   2.83
+  ttso_pinned             14      10        9        0.26-0.66      2435   5.19
+  ttso_pinned_masked      17      12       11        0.34-0.74      1644   4.23
+  ttso_pinned: mean s/problem mps 7.16 vs llama.cpp 5.19
+  ttso_pinned_masked: mean s/problem mps 6.22 vs llama.cpp 4.23
+  memory: mps allocator peak 1.49 GB; llama.cpp Metal buffers 1.62 GB, CPU buffers 0.30 GB, host logits array 1.16 GB
+  per-problem mismatches (problem, regime): [(4, 'ttso_pinned'), (4, 'ttso_pinned_masked')]
+  problem 4 ttso_pinned: greedy diverges at token 85 ('ref' vs 'convert'), top-two margin mps 0.0156, llama.cpp 0.0211 -> float16 tie
+  problem 4 ttso_pinned_masked: greedy diverges at token 85 ('ref' vs 'convert'), top-two margin mps 0.0156, llama.cpp 0.0211 -> float16 tie
+.
+[incremental] 62743 prefixes of 150 documents (36 complete): SchemaState == SchemaPrefix
+.
+[incremental] 11093 accept() queries and the candidates() masks agree on 6 tokenized documents
+.
+[incremental] 20 seed-0 tasks, masked greedy / masked ttso repair / masked Best-of-N: 20/20 token-for-token identical (reparse vs incremental)
+                                       reparse incremental speedup
+  mask s/problem, greedy                 0.015       0.003    4.9x
+  mask s/problem, greedy + repair        0.063       0.007    9.2x
+  mask s/problem, Best-of-N              0.008       0.002    4.3x
+  latency s/problem, greedy               4.98        4.22   1.18x
+  latency s/problem, greedy + repair      7.44        6.22   1.20x
+  CPU replay over the 20 repaired completions (2939 tokens): accept() 39 vs 6 us/token (6.3x), candidates() 2.91 vs 0.10 ms/token (29.5x)
+.
+28 passed in 992.03s (0:16:32)

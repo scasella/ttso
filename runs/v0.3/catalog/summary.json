@@ -1,0 +1,107 @@
+{
+ "n": 50,
+ "arms": [
+  "greedy",
+  "best_of_n",
+  "local",
+  "upstream",
+  "smart",
+  "smart_pinned"
+ ],
+ "greedy": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.0714
+  ],
+  "latency_mean_s": 2.9501999999999997
+ },
+ "best_of_n": {
+  "valid": 1,
+  "correct": 0,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.0714
+  ],
+  "tokens_total": 5311
+ },
+ "local": {
+  "valid": 28,
+  "correct": 19,
+  "faithful": 18,
+  "faithful_wilson95": [
+   0.2414,
+   0.4986
+  ],
+  "extra_tokens_total": 4676,
+  "latency_mean_s": 69.02642,
+  "latency_max_s": 3076.109,
+  "same_greedy": true,
+  "rewinds": 124,
+  "replayed_tokens": 903,
+  "replayed_per_rewind": 7.282258064516129
+ },
+ "upstream": {
+  "valid": 28,
+  "correct": 22,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.0714
+  ],
+  "extra_tokens_total": 5545,
+  "latency_mean_s": 8.4239,
+  "latency_max_s": 21.628,
+  "same_greedy": true,
+  "rewinds": 126,
+  "replayed_tokens": 826,
+  "replayed_per_rewind": 6.555555555555555
+ },
+ "smart": {
+  "valid": 29,
+  "correct": 23,
+  "faithful": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.0714
+  ],
+  "extra_tokens_total": 5382,
+  "latency_mean_s": 8.4261,
+  "latency_max_s": 24.193,
+  "same_greedy": true,
+  "rewinds": 124,
+  "replayed_tokens": 812,
+  "replayed_per_rewind": 6.548387096774194
+ },
+ "smart_pinned": {
+  "valid": 28,
+  "correct": 19,
+  "faithful": 18,
+  "faithful_wilson95": [
+   0.2414,
+   0.4986
+  ],
+  "extra_tokens_total": 4681,
+  "latency_mean_s": 7.61388,
+  "latency_max_s": 15.445,
+  "same_greedy": true,
+  "rewinds": 124,
+  "replayed_tokens": 898,
+  "replayed_per_rewind": 7.241935483870968
+ },
+ "peak_mps_allocated_gb": 2.22047744,
+ "ckpt_peak_mib": 320.34375,
+ "model": "Qwen/Qwen3.5-0.8B",
+ "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+ "dtype": "float16",
+ "split": "heldout",
+ "n_tasks": 50,
+ "wall_s": 4504.3,
+ "max_new_tokens": 256,
+ "k_max": 3,
+ "torch": "2.15.0",
+ "mps": true
+}

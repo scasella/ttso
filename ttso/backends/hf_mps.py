@@ -35,7 +35,9 @@ class HuggingFaceMPSBackend(Backend):
         self.hybrid = "linear_attention" in (getattr(text_cfg, "layer_types", None) or [])
         self.ckpt_every = ckpt_every
         self.ckpt_bytes_peak = 0
-        self.rewinds, self.replayed = 0, 0  # rewind_kv_cache calls, tokens re-fed after a checkpoint restore
+        # rewind_kv_cache calls (including no-op rewinds to the current length) and tokens re-fed
+        # after a checkpoint restore
+        self.rewinds, self.replayed = 0, 0
         self._texts = None
         self._peak = 0
 

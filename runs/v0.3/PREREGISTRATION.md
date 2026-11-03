@@ -262,3 +262,32 @@ The CPU replay runs over the 20 repaired completions (2,939 tokens).
   start. If a run fails for a technical reason, the fix and the rerun are recorded in this file and
   in the v0.3 report.
 - Development-set numbers are reported separately from held-out numbers and are never pooled.
+
+## Post-run record (added after the held-out runs; nothing above was changed)
+
+- **Runs.** Both held-out runs completed on the frozen code, with no reruns: `runs/v0.3/json` and
+  `runs/v0.3/catalog`.
+  - The frozen code is `34c79c0` in github.com/scasella/ttso; it was pushed before either run
+    started.
+  - Both runs record the model as Qwen/Qwen3.5-0.8B at revision `2fc06364…`.
+- **System sleep during 2B.**
+  - The Mac entered low-power sleep at 14:02 with the battery at 1% and woke at 14:52 on AC power.
+    The `pmset` log shows 3,054 s asleep.
+  - The pause fell inside `local`'s repair of task 33, which recorded 3,076 s.
+  - Decoding is deterministic and the process resumed where it stopped, so no outcome is affected.
+    Only that one latency is wrong; latency means are reported with the 3,054 s removed from it.
+  - The 2A run had finished at 13:46, before the sleep.
+- **Dev-set predictions.**
+  - `smart_pinned` and `local` ended identical on 49 of the 50 held-out tasks. On task 25, round 3
+    rewrote the whole `U32.from_nat(...)` operand under pinning but only its argument under
+    LocalOnly; both ended incorrect.
+  - `smart` and `upstream` ended identical on 48 of 50. On task 26 both are correct; on task 38
+    only `smart` is.
+- **Mask integrity.** No masked 2A output (greedy, repair or Best-of-N) left the schema.
+- **Changes after the runs.** None touches the code that produced the results.
+  - The code review led to one test change: the incremental-mask gate's speed assertion now uses
+    the fixed CPU replay instead of two live runs.
+  - It also led to three docstring or comment notes: `same_greedy` under a shared decode, the
+    rewind counter, and `CatalogSuite`'s HuggingFace-only prompt.
+  - `scripts/mask_timing_v03.py` (Task 1 timing) was added. It is not part of the test.
+  - The full suite passed, 28 of 28 (`runs/v0.3/suite.log`).
