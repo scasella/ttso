@@ -53,3 +53,16 @@
 2026-11-04T13:47:24Z LOW free=28% pressure=2 swap_used=7038.75M (not paused)
 2026-11-04T13:49:00Z LOW free=34% pressure=2 swap_used=6990.75M (not paused)
 2026-11-04T13:49:15Z LOW free=36% pressure=2 swap_used=6974.75M (not paused)
+2026-11-04T13:55:52Z LOW free=26% pressure=2 swap_used=6400.25M (not paused)
+2026-11-04T13:59:44Z LOW free=26% pressure=2 swap_used=6564.62M (not paused)
+2026-11-04T14:01:19Z LOW free=33% pressure=2 swap_used=6418.12M (not paused)
+2026-11-04T14:03:00Z LOW free=29% pressure=2 swap_used=6448.31M (not paused)
+2026-11-04T14:36:22Z LOW free=27% pressure=2 swap_used=2941.50M (not paused)
+2026-11-04T14:55:19Z LOW free=31% pressure=2 swap_used=2893.50M (not paused)
+2026-11-04T14:56:24Z LOW free=37% pressure=2 swap_used=2893.50M (not paused)
+2026-11-04T14:58:25Z LOW free=28% pressure=2 swap_used=2893.50M (not paused)
+2026-11-04T15:00:01Z LOW free=32% pressure=2 swap_used=2885.50M (not paused)
+2026-11-04T15:01:51Z LOW free=27% pressure=2 swap_used=2957.12M (not paused)
+2026-11-04T15:05:48Z LOW free=33% pressure=2 swap_used=3695.06M (not paused)
+2026-11-04T15:25:25Z PAUSE pids=58711 pressure=4 free=24% swap_used=3484.12M
+2026-11-04T15:26:00Z RESUME pids=58711 pressure=2 free=49% swap_used=4581.00M

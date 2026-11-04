@@ -48,7 +48,7 @@ def system_sleeps():
     out = subprocess.run(["pmset", "-g", "log"], capture_output=True, text=True).stdout
     ev = []
     for line in out.splitlines():
-        m = re.match(r"(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d{4}) (Sleep|Wake|DarkWake)\s", line)
+        m = re.match(r"(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d{4}) (Sleep|Wake|DarkWake)(?:\t| {2,})", line)
         if m:
             ev.append((datetime.strptime(m[1], "%Y-%m-%d %H:%M:%S %z").timestamp(), m[2] == "Sleep"))
     return _intervals(ev)

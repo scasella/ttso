@@ -1,0 +1,215 @@
+{
+ "n": 50,
+ "arms": [
+  "greedy",
+  "best_of_n",
+  "best_of_2_full",
+  "local",
+  "upstream",
+  "smart",
+  "smart_pinned"
+ ],
+ "greedy": {
+  "valid": 8,
+  "correct": 4,
+  "faithful": 4,
+  "correct_5": 4,
+  "faithful_5": 4,
+  "faithful_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "faithful_5_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "latency_mean_s": 2.8207600000000004
+ },
+ "best_of_n": {
+  "valid": 8,
+  "correct": 4,
+  "faithful": 4,
+  "correct_5": 4,
+  "faithful_5": 4,
+  "faithful_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "faithful_5_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "tokens_total": 3778,
+  "samples": {
+   "tasks_sampled": 42,
+   "total": 80,
+   "complete": 39,
+   "truncated": 41,
+   "capped": 0,
+   "complete_per_sampled_task": 0.9285714285714286,
+   "truncated_per_sampled_task": 0.9761904761904762,
+   "tasks_with_no_complete_sample": 25
+  }
+ },
+ "best_of_2_full": {
+  "valid": 10,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.0435,
+   0.2136
+  ],
+  "faithful_5_wilson95": [
+   0.0435,
+   0.2136
+  ],
+  "tokens_total": 5642,
+  "samples": {
+   "tasks_sampled": 42,
+   "total": 83,
+   "complete": 82,
+   "truncated": 0,
+   "capped": 1,
+   "complete_per_sampled_task": 1.9523809523809523,
+   "truncated_per_sampled_task": 0.0,
+   "tasks_with_no_complete_sample": 0
+  }
+ },
+ "local": {
+  "valid": 21,
+  "correct": 11,
+  "faithful": 11,
+  "correct_5": 11,
+  "faithful_5": 11,
+  "faithful_wilson95": [
+   0.1275,
+   0.3524
+  ],
+  "faithful_5_wilson95": [
+   0.1275,
+   0.3524
+  ],
+  "extra_tokens_total": 3335,
+  "latency_mean_s": 5.4225,
+  "latency_max_s": 22.043,
+  "same_greedy": true,
+  "rewinds": 103,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 103,
+   "same_diagnosis": 103,
+   "same_edit": 103,
+   "deltanet_ms": 0.31449795034894884,
+   "symbolic_ms": 0.015139563101823034,
+   "main": "deltanet"
+  }
+ },
+ "upstream": {
+  "valid": 24,
+  "correct": 17,
+  "faithful": 4,
+  "correct_5": 17,
+  "faithful_5": 4,
+  "faithful_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "faithful_5_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "extra_tokens_total": 3778,
+  "latency_mean_s": 5.6146199999999995,
+  "latency_max_s": 22.013,
+  "same_greedy": true,
+  "rewinds": 98,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 98,
+   "same_diagnosis": 98,
+   "same_edit": 98,
+   "deltanet_ms": 1.018822683159224,
+   "symbolic_ms": 0.01378196982989962,
+   "main": "deltanet"
+  }
+ },
+ "smart": {
+  "valid": 24,
+  "correct": 17,
+  "faithful": 4,
+  "correct_5": 17,
+  "faithful_5": 4,
+  "faithful_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "faithful_5_wilson95": [
+   0.0315,
+   0.1884
+  ],
+  "extra_tokens_total": 3778,
+  "latency_mean_s": 5.68114,
+  "latency_max_s": 21.941,
+  "same_greedy": true,
+  "rewinds": 98,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 98,
+   "same_diagnosis": 98,
+   "same_edit": 98,
+   "deltanet_ms": 0.9944098036408386,
+   "symbolic_ms": 0.012772501391662779,
+   "main": "deltanet"
+  }
+ },
+ "smart_pinned": {
+  "valid": 23,
+  "correct": 13,
+  "faithful": 13,
+  "correct_5": 13,
+  "faithful_5": 13,
+  "faithful_wilson95": [
+   0.1587,
+   0.3955
+  ],
+  "faithful_5_wilson95": [
+   0.1587,
+   0.3955
+  ],
+  "extra_tokens_total": 3263,
+  "latency_mean_s": 5.37036,
+  "latency_max_s": 22.008,
+  "same_greedy": true,
+  "rewinds": 102,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 102,
+   "same_diagnosis": 102,
+   "same_edit": 102,
+   "deltanet_ms": 0.9723239699287304,
+   "symbolic_ms": 0.01270215622806812,
+   "main": "deltanet"
+  }
+ },
+ "peak_mps_allocated_gb": 4.588498432,
+ "peak_rss_gb": 2.798829568,
+ "model": "google/gemma-4-E2B",
+ "revision": "433813a669639fd7eaa83155828e9000ed357d53",
+ "dtype": "bfloat16",
+ "split": "heldout",
+ "n_tasks": 50,
+ "wall_s": 1128.6,
+ "max_new_tokens": 256,
+ "k_max": 3,
+ "device_weights_gib": 4.246382236480713,
+ "mapped_gib": 4.375,
+ "prompt": "raw",
+ "torch": "2.15.0",
+ "mps": true
+}

@@ -1,0 +1,10 @@
+13:55:41 start json gemma-4-E2B 
+14:42:41 done json gemma-4-E2B exit=0
+14:42:41 start catalog gemma-4-E2B 
+15:01:41 done catalog gemma-4-E2B exit=0
+15:01:41 start json gemma-4-E2B-it --n 20
+15:14:05 done json gemma-4-E2B-it exit=0
+runs/v0.4/gemma-4-E2B/json 0 task(s) overlap a pause or sleep: {}
+runs/v0.4/gemma-4-E2B/catalog 0 task(s) overlap a pause or sleep: {}
+runs/v0.4/gemma-4-E2B-it/json 0 task(s) overlap a pause or sleep: {}
+15:14:08 all done

@@ -24,6 +24,8 @@ import torch
 from ttso.engine import benchmark
 
 MODEL = os.environ.get("TTSO_GEMMA_MODEL", "google/gemma-4-E2B")
+REVISION = {"google/gemma-4-E2B": "433813a669639fd7eaa83155828e9000ed357d53",
+            "google/gemma-4-E2B-it": "4adf15748de9e1a0097b6274cee9c15836c41c37"}  # as in the v0.4 benchmarks
 PROMPT = "def add(a: int, b: int) -> int:\n    return"
 LONG = benchmark.prompt_of(benchmark.make_tasks(1, seed=0)[0])  # a dev prompt, 678 tokens with BOS
 
@@ -33,7 +35,7 @@ def gemma():
     if not torch.backends.mps.is_available():
         pytest.skip("needs Apple mps")
     from ttso.backends.hf_mps import HuggingFaceMPSBackend
-    be = HuggingFaceMPSBackend(MODEL, device="mps", dtype=torch.bfloat16)
+    be = HuggingFaceMPSBackend(MODEL, device="mps", dtype=torch.bfloat16, revision=REVISION.get(MODEL))
     if be.model.config.model_type != "gemma4_text":
         pytest.skip(f"{MODEL} is not Gemma 4")
     return be
@@ -94,7 +96,7 @@ def test_type_names_have_distinct_first_tokens(model_id):
     from transformers import AutoTokenizer
     from ttso.cartridges.bendlite import BendLiteCatalogCartridge
     from ttso.cartridges.typed_json_dag import TypedJSONDAGCartridge
-    tok = AutoTokenizer.from_pretrained(model_id)
+    tok = AutoTokenizer.from_pretrained(model_id, revision=REVISION.get(model_id))
     texts = tok.batch_decode([[i] for i in range(len(tok))])
     enc = lambda s: tok(s, add_special_tokens=False)["input_ids"]
     want = {"U32": {"U", "U32"}, "Nat": {"Nat"}, "Float": {"Float"}, "USD": {"USD"}, "EUR": {"EUR"}}
@@ -113,9 +115,9 @@ def test_prompts_start_with_one_bos():
     from ttso.backends.hf_mps import HuggingFaceMPSBackend
     from ttso.engine import catalog_suite
     for model_id in (MODEL, MODEL + "-it"):
-        tok = AutoTokenizer.from_pretrained(model_id)
+        tok = AutoTokenizer.from_pretrained(model_id, revision=REVISION.get(model_id))
         if tok.chat_template is None:
-            tok.chat_template = AutoTokenizer.from_pretrained(MODEL + "-it").chat_template
+            tok.chat_template = AutoTokenizer.from_pretrained(MODEL + "-it", revision=REVISION.get(MODEL + "-it")).chat_template
         be = SimpleNamespace(tok=tok, bos_id=tok.bos_token_id, encode=lambda s: tok(s, add_special_tokens=False)["input_ids"])
         be.prompt_ids = lambda text: HuggingFaceMPSBackend.prompt_ids(be, text)
         for P in (benchmark.JSONDAGSuite().prompt_ids(be, benchmark.make_tasks(1, seed=0)[0]),

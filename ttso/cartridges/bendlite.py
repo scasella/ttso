@@ -250,12 +250,14 @@ class BendLiteCatalogCartridge(Cartridge):
         return ~self.tcm.special
 
     def stop(self, tokens):
-        s = self.text(tokens)
-        k = s.find("def main(")
-        if k < 0:
-            return False
-        lines = s[k:].split("\n")
-        return len(lines) >= 3 and lines[1].strip() != ""
+        return program_complete(self.text(tokens))
+
+
+def program_complete(text):
+    """The program is finished: `def main(` has been followed by its body line and a newline."""
+    k = text.find("def main(")
+    lines = text[k:].split("\n") if k >= 0 else []
+    return len(lines) >= 3 and lines[1].strip() != ""
 
 
 def reference_check(text):

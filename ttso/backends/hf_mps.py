@@ -77,11 +77,10 @@ class MappedEmbedding(torch.nn.Module):
 
     def __init__(self, table, scale):
         super().__init__()
-        self.table, self.scale = [table], scale
+        self.table, self.scale = [table], torch.tensor(scale, dtype=table.dtype)
 
     def forward(self, input_ids):
-        t = self.table[0]
-        out = torch.nn.functional.embedding(input_ids.to("cpu"), t) * torch.tensor(self.scale, dtype=t.dtype)
+        out = torch.nn.functional.embedding(input_ids.to("cpu"), self.table[0]) * self.scale
         return out.to(input_ids.device)
 
 
@@ -263,9 +262,11 @@ class HuggingFaceMPSBackend(Backend):
                 _, kv_cache = self._forward(kv_cache, [y])
         elif any(isinstance(layer, DynamicSlidingWindowLayer) for layer in kv_cache.layers):
             for layer in kv_cache.layers:
-                if isinstance(layer, DynamicSlidingWindowLayer):
+                if isinstance(layer, DynamicSlidingWindowLayer) and not layer.record_past:
+                    layer.crop(target_seq_len - cur)  # a cache built elsewhere: exact only inside the window
+                elif isinstance(layer, DynamicSlidingWindowLayer):
                     # recording mode: the buffer holds every position, so slicing it is the rewind
-                    assert layer.record_past and layer.keys.shape[-2] == layer.cumulative_length
+                    assert layer.keys.shape[-2] == layer.cumulative_length
                     layer.keys = layer.keys[:, :, :target_seq_len]
                     layer.values = layer.values[:, :, :target_seq_len]
                     layer.cumulative_length = target_seq_len

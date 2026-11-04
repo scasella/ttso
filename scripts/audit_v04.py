@@ -51,9 +51,7 @@ def complete(suite, text):
     """Did generation finish a document (the cartridge's stop criterion, on text)?"""
     if suite == "json":
         return typed_json_dag.json_end(text) is not None
-    k = text.find("def main(")
-    lines = text[k:].split("\n") if k >= 0 else []
-    return len(lines) >= 3 and lines[1].strip() != ""
+    return bendlite.program_complete(text)
 
 
 def tests(rows, family, outcome):

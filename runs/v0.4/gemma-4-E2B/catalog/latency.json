@@ -1,0 +1,25 @@
+{
+ "affected_tasks": {},
+ "n_left_out": 0,
+ "latency": {
+  "local": {
+   "mean_all_s": 5.4225,
+   "mean_s": 5.4225
+  },
+  "upstream": {
+   "mean_all_s": 5.6146199999999995,
+   "mean_s": 5.6146199999999995
+  },
+  "smart": {
+   "mean_all_s": 5.68114,
+   "mean_s": 5.68114
+  },
+  "smart_pinned": {
+   "mean_all_s": 5.37036,
+   "mean_s": 5.37036
+  },
+  "greedy": {
+   "mean_s": 2.8207600000000004
+  }
+ }
+}

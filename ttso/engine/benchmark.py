@@ -114,7 +114,7 @@ def vectors(task):
         elif task["kind"] == 3:
             s, avoid = v[0] + v[1], set(v[:2]) | set(task["values"])
             side = range(max(2, s // 2), s) if j % 2 == 0 else range(s + 1, s + hi + 1)  # c < a + b, c > a + b
-            v[2] = rng.choice([c for c in side if c not in avoid])
+            v[2] = rng.choice([c for c in side if c not in avoid] or [c for c in side if c not in v[:2]] or [s + 1])
         out.append(dict(zip(task["inputs"], v)))
     return out
 
@@ -313,7 +313,7 @@ def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperat
         for arm, reg in bon.items():
             g_arm = row[gname(reg)]
             budget = row[reg]["extra_tokens"]
-            if (g_arm["valid"] and g_arm.get("contract_ok", True)) or budget == 0:  # the regime's oracle
+            if (g_arm["valid"] and regimes[reg][0].contract_ok(greedy_toks[gname(reg)])) or budget == 0:
                 row[arm] = {k: g_arm[k] for k in g_arm if k in _OUTCOME_KEYS} | {"samples": 0, "tokens": 0,
                                                                               "sample_kinds": []}
                 continue
@@ -326,7 +326,7 @@ def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperat
                                                         "mask_s": _mask_s(regimes[reg][0]) - m0}
         for arm, reg in (full or {}).items():
             g_arm = row[gname(reg)]
-            if g_arm["valid"] and g_arm.get("contract_ok", True):
+            if g_arm["valid"] and regimes[reg][0].contract_ok(greedy_toks[gname(reg)]):  # the regime's oracle
                 row[arm] = {k: g_arm[k] for k in g_arm if k in _OUTCOME_KEYS} | {"samples": 0, "tokens": 0,
                                                                               "sample_kinds": []}
                 continue

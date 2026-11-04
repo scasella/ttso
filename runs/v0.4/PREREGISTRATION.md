@@ -452,3 +452,36 @@ tasks behave like dev. 5–0 on dev would need about 8–0 on 60 tasks to pass H
 - repair from a copied cache matches repair from a second decode and from a fresh one, on 8 of 8
   (`runs/v0.4/dev/gemma-4-E2B/determinism.json`).
 
+
+## Post-run record (added after the held-out runs)
+
+- **Freeze.** The code and this file, without this section, were pushed to github.com/scasella/ttso
+  as `310a2a6` at 13:55 UTC on 4 November 2026, before any held-out task ran. The runs then went in
+  the pre-registered order:
+
+  | Run | Started (UTC) | Finished (UTC) |
+  | --- | --- | --- |
+  | 3A base | 13:55 | 14:42 |
+  | 3B base | 14:42 | 15:01 |
+  | 3A `-it` | 15:01 | 15:14 |
+
+- **Pauses and sleeps.** All three runs ran under `caffeinate -i`. The memory guard logged no pause
+  during them, and pmset logged no sleep: no task is left out of the latency means
+  (`latency.json` in each run directory).
+- **Code changes after the freeze.** These came from the final code review. None changes a recorded
+  outcome:
+  - `benchmark.vectors` can no longer draw from an empty set for the min task. The 80 frozen tasks'
+    vectors are unchanged, and the audit re-runs identically.
+  - The Best-of-N / `best_of_2_full` skip rule judges the greedy completion with the matched
+    regime's own cartridge, not the first regime's. The v0.4 scripts list the contract-pinned
+    regime first, so the frozen runs are unaffected.
+  - Robustness and efficiency fixes:
+    - the sliding-window rewind of a cache built outside the backend;
+    - the scale tensor of `MappedEmbedding`, built once;
+    - the pmset parser in `scripts/pauses_v04.py`;
+    - the Gemma revision pinned in the rewind gate;
+    - one shared program-complete rule for the catalog.
+- **Disclosed:** the symbolic shadow runs at every repair round, so v0.4 repair latencies include it
+  (about 0.1–4 ms of diagnosis per round, plus one more routing pass). They are therefore not
+  directly comparable with v0.3's.
+- Results are in `runs/v0.4/PROGRESS_REPORT.md` and the README.

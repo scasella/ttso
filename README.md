@@ -109,6 +109,107 @@ Cartridge options:
 | `engine/` | `repair_loop.py` (the 3-round loop, Best-of-N with per-sample accounting, `best_of_k`, the symbolic shadow), `benchmark.py` (JSON DAG tasks and their 5 input vectors, the paired harness with pluggable suites and an optional shared greedy decode, paired statistics, Wilson intervals, Holm), `catalog_suite.py` (the frozen v0.3 BendLite catalog prompts, outcomes and 5 catalogs) |
 | `scripts/` | `benchmark_v04.py` (v0.4, Gemma 4 E2B: `{json,catalog} {dev,heldout} --model`), `audit_v04.py` (re-scores v0.2 / v0.3 on 5 vectors), `determinism_v04.py`, `benchmark_v03.py` (v0.3, Qwen3.5-0.8B), `benchmark_v02.py`, `dev_v02.py`, `recheck_bon_masked_v02.py` |
 
+## Held-out benchmarks (v0.4, Gemma 4 E2B, pre-registered)
+
+The protocol is in [`runs/v0.4/PREREGISTRATION.md`](runs/v0.4/PREREGISTRATION.md). It was pushed as `310a2a6` before any held-out task ran. Every setting was fixed on the 20 seed-0 dev tasks per suite; the full report is [`runs/v0.4/PROGRESS_REPORT.md`](runs/v0.4/PROGRESS_REPORT.md).
+
+- **Model:** google/gemma-4-E2B (`433813a`) and -it (`4adf157`), bf16 on `mps`, text-only.
+- **Weights:** 4.25 GiB on the GPU, plus a 4.38 GiB memory-mapped per-layer embedding table on the cpu.
+- **Rewind:** exact, with no replay (recording-mode sliding layers).
+- **Scoring:** primary outcome Faithful_5; every repair round also runs the symbolic verifier as a shadow.
+- **Memory, every run:** peak PyTorch MPS tensor allocation 4.59–4.62 GB; peak process RSS 2.7–2.8 GB.
+- **No pauses:** no task overlapped a memory-guard pause or a system sleep.
+
+### 3A. Typed JSON DAG (60 held-out tasks)
+
+| Arm | Valid | Correct_1 | Correct_5 | Faithful_1 | Faithful_5 | Faithful_5 95% CI | s / problem |
+|---|---|---|---|---|---|---|---|
+| greedy, greedy_masked | 30 | 17 | 17 | 17 | 17 | 0.19–0.41 | 5.8, 5.7 |
+| best_of_n, best_of_n_masked | 30 | 17 | 17 | 17 | 17 | 0.19–0.41 | |
+| best_of_2_full, best_of_2_full_masked (secondary) | 30 | 17 | 17 | 17 | 17 | 0.19–0.41 | |
+| ttso_pinned (contract) | 30 | 17 | 17 | 17 | 17 | 0.19–0.41 | 9.0 |
+| ttso_pinned_masked (contract) | **46** | **33** | **33** | **33** | **33** | 0.42–0.67 | 8.8 |
+| ttso_unpinned, ttso_self_pinned (secondary) | 30 | 17 | 17 | 17 | 17 | 0.19–0.41 | 9.3, 8.9 |
+
+| | Comparison (Faithful_5) | Wins–losses | Holm p | |
+|---|---|---|---|---|
+| H1 | ttso_pinned vs greedy | 0–0 | 1 | not supported |
+| H2 | ttso_pinned vs best_of_n | 0–0 | 1 | not supported |
+| H3 | ttso_pinned_masked vs greedy_masked | 16–0 | 0.00012 | **supported** |
+| H4 | ttso_pinned_masked vs best_of_n_masked | 16–0 | 0.00012 | **supported** |
+
+**Repair works on Gemma base only with the forward mask, as the dev set predicted.**
+
+- **Every one of the 30 invalid greedy programs** writes a U32 literal with a `u32` suffix (`"16u32"`). That is a malformed literal: a hard error with no gradient.
+  - Without the mask, the Case C fallback bans its first digit, so the model changes the number and every round is spent.
+  - The mask never admits the suffix, which turns the error into a typed literal mismatch that the gradient edit fixes.
+- **Where masked repair gains:** 15 of the 15 Nat + U32 + U32 sum tasks, and 1 min task.
+- **Out of reach for every arm:**
+  - the USD tasks stay valid but incorrect: the model adds an invented `charge` input;
+  - the min tasks fail in every arm.
+- **Nothing else moved.**
+  - Contract and self pinning are identical: Gemma never declared an input with the wrong type.
+  - The mask alone changes nothing.
+  - No program is a single-vector coincidence.
+  - Best-of-N found nothing: on 16 of the 30 tasks it sampled, its budget ran out before any sample finished (30 of its 44 samples were cut off).
+  - `best_of_2_full` completed all 120 of its samples, spending 8,715 / 8,464 tokens against repair's 5,113 / 4,877, and still found nothing.
+
+**Post-trained Gemma 4 E2B-it** (first 20 held-out tasks, exploratory):
+
+| Arm | Valid | Faithful_1 | Faithful_5 |
+|---|---|---|---|
+| greedy / masked | 6 / 10 | 5 / 5 | 5 / 5 |
+| best_of_n, best_of_2_full (each, both settings) | 6–10 | 5 | 5 |
+| ttso_pinned | 15 | 12 | 9 |
+| ttso_pinned_masked | 20 | 15 | 9 |
+
+- **Single-vector scoring would overstate this result.** On Faithful_1, repair beats greedy 7–0 and 10–0 (Holm p ≤ 0.031); on Faithful_5 it is 4–0 for each pair (Holm p = 0.5).
+- **The difference is coincidences.** 3 pinned and 6 pinned + mask programs return the right number on the stated input only.
+- **Unlike post-trained Qwen3-0.6B in v0.2,** Gemma -it gains from unmasked repair too: it does not write the `u32` suffix.
+
+### 3B. BendLite catalog synthesis (50 held-out tasks)
+
+The base checkpoint has no chat template. Under Gemma's chat template it only repeated the system prompt (dev), so it gets the same prompt content as a plain document. 3B is therefore not a like-for-like comparison with v0.3's chat prompt on Qwen3.5.
+
+| Arm | Valid | Correct_5 | Faithful_5 | Faithful_5 95% CI | s / problem |
+|---|---|---|---|---|---|
+| greedy | 8 | 4 | 4 | 0.03–0.19 | 2.8 |
+| best_of_n (matched to upstream) | 8 | 4 | 4 | 0.03–0.19 | |
+| best_of_2_full (secondary) | 10 | 5 | 5 | 0.04–0.21 | |
+| local | 21 | 11 | **11** | 0.13–0.35 | 5.4 |
+| upstream | 24 | **17** | 4 | 0.03–0.19 | 5.6 |
+| smart (`pin_inputs=False`) | 24 | **17** | 4 | 0.03–0.19 | 5.7 |
+| smart_pinned (`pin_inputs=True`) | 23 | 13 | **13** | 0.16–0.40 | 5.4 |
+
+| | Comparison (Faithful_5) | Wins–losses | Holm p | |
+|---|---|---|---|---|
+| C1 | smart vs best_of_n | 0–0 | 1 | not supported (predicted) |
+| C2 | smart_pinned vs best_of_n | 9–0 | 0.016 | **supported** |
+| C3 | local vs best_of_n | 7–0 | 0.047 | **supported** |
+| C4 | upstream vs best_of_n | 0–0 | 1 | not supported (predicted) |
+| C5 | smart_pinned vs smart (single test) | 9–0 | p = 0.0039 | **supported** |
+
+- **On Correct_5,** v0.3's primary family, all four are supported: 13–0, 9–0, 7–0 and 13–0, with Holm p ≤ 0.016.
+- **Unpinned repair (Smart, Upstream) makes programs correct by retyping Nat items as U32,** so it is never faithful beyond greedy's own.
+- **Gemma base's greedy errors are mostly structural,** unlike Qwen3.5's:
+  - 21 named-argument or stray-def parse errors;
+  - 8 undeclared names;
+  - 10 Nat-in-U32 type errors.
+  Only the type errors carry a gradient.
+- **Best-of-N:** no complete sample on 25 of the 42 tasks it sampled. `best_of_2_full` completed 82 of its 83 samples and gained 1 program.
+- **Shadow:** DeltaNet and symbolic routing agree on 401 of 401 rounds; a diagnosis costs 0.3–1.0 ms against 0.013–0.015 ms.
+
+### DeltaNet vs symbolic provenance
+
+Across Gates 1–3, the 20 dev tasks (Qwen3-0.6B-Base) and every held-out repair round on Gemma (789 rounds: 345 in 3A, 401 in 3B, 43 in 3A-it), `CompiledDeltaNet` backward routing and `SymbolicProvenanceVerifier` made identical diagnoses and identical edits.
+
+The DeltaNet is an exact algebraic compilation of a provenance table into a recurrent network:
+- its memory row for a slot is the one-hot type of the slot's latest declaration;
+- a check's loss is 0 or 1;
+- the gradient of a failed check reaches exactly the declaration it read and the call's own literal, and is constructive exactly on tokens of the needed type.
+
+For discrete inference-time repair the table suffices, at about 1/20–1/160 of the CPU cost per diagnosis. The DeltaNet's added value is differentiability, for settings that train through it; no ttso result so far depends on it.
+
 ## Held-out benchmarks (v0.3, Qwen3.5-0.8B, pre-registered)
 
 The protocol is in [`runs/v0.3/PREREGISTRATION.md`](runs/v0.3/PREREGISTRATION.md). It was pushed as `34c79c0` before any held-out task ran on Qwen3.5. All prompt, mask and harness settings were fixed on development tasks only.
@@ -266,7 +367,7 @@ Run them with:
 .venv/bin/python -m pytest
 ```
 
-There are 47 tests; expect about 45 minutes (re-timed after the v0.4 held-out runs), most of it Gate 4, the incremental-mask gate, the symbolic shadow on the dev tasks and the Gemma rewind gate. The first run downloads Qwen3-0.6B, Qwen3-0.6B-Base, Qwen3.5-0.8B and Gemma 4 E2B (both checkpoints' tokenizers; the base weights, 9.5 GiB) from the Hugging Face Hub. The parity and GGUF tests skip when their GGUF file is missing. Results through v0.3 are from 3 November 2026 and the v0.4 rows from 4 November, on an M4 Pro (24 GB) with torch 2.15, transformers 5.22.1 and llama-cpp-python 0.3.36.
+There are 47 tests; expect about 20 minutes (19.4 on 4 November 2026), most of it Gate 4, the incremental-mask gate, the symbolic shadow on the dev tasks and the Gemma rewind gate. The first run downloads Qwen3-0.6B, Qwen3-0.6B-Base, Qwen3.5-0.8B and Gemma 4 E2B (both checkpoints' tokenizers; the base weights, 9.5 GiB) from the Hugging Face Hub. The parity and GGUF tests skip when their GGUF file is missing. Results through v0.3 are from 3 November 2026 and the v0.4 rows from 4 November, on an M4 Pro (24 GB) with torch 2.15, transformers 5.22.1 and llama-cpp-python 0.3.36.
 
 | Gate | Result |
 |---|---|

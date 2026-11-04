@@ -1,0 +1,28 @@
+{
+ "affected_tasks": {},
+ "n_left_out": 0,
+ "latency": {
+  "ttso_pinned": {
+   "mean_all_s": 9.03565,
+   "mean_s": 9.03565
+  },
+  "ttso_pinned_masked": {
+   "mean_all_s": 8.835233333333333,
+   "mean_s": 8.835233333333333
+  },
+  "ttso_unpinned": {
+   "mean_all_s": 9.256833333333333,
+   "mean_s": 9.256833333333333
+  },
+  "ttso_self_pinned": {
+   "mean_all_s": 8.931183333333333,
+   "mean_s": 8.931183333333333
+  },
+  "greedy": {
+   "mean_s": 5.758083333333333
+  },
+  "greedy_masked": {
+   "mean_s": 5.700833333333334
+  }
+ }
+}
