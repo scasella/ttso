@@ -20,9 +20,21 @@ Ops compiled into the DeltaNet (slot = input or node id):
                                     CHECK_VAR(n, U32)               at the converter      "convert result"
     "call": {"x": "6n"}             CHECK_CALL(x)                   at the suffix token   "call arg"
 The suffix token is the token right after a literal's digits (the closing quote for a plain U32).
-With pin_inputs=True (the default) the input types are frozen as the prompt's contract; a failed
-ref / convert check then falls back to banning the arg's key token ("ref" / "convert"), so the
-model can rewrite the argument as a conversion (LocalOnly). pin_inputs=False is the spec's routing.
+Input pinning (pin_inputs), v0.4:
+  True     (the default) the task's input contract. bind_task(task) gives the cartridge the task's
+           stated inputs and types. An input the task names gets, at its type token, a
+           CHECK_VAR(id, stated type) right after its DECLARE ("input contract"): a wrong written
+           type is the first failed check, its declaration is flagged (Case B) and the gradient
+           edit rewrites it to the stated type. A type that matches is frozen. With the forward
+           mask the wrong type is never decoded: the type of a named input is held to the stated
+           type, through its closing quote (U32 is two tokens, U and 32). contract_ok() is the
+           repair loop's extra stopping test; check() stays the plain reference checker, so Valid
+           means the same in every arm. With no task bound, as in v0.2 / v0.3: "self".
+  "self"   v0.2 / v0.3: freeze each input type as the model wrote it, right or wrong.
+  False    the spec's routing: every declaration is editable.
+With a frozen input, a failed ref / convert check falls back to banning the arg's key token ("ref" /
+"convert"), so the model can rewrite the argument as a conversion (LocalOnly). Input ids are never
+constrained, and inputs the task does not name are pinned as written.
 
 apply_forward_mask=True adds a forward structural mask (SchemaPrefix): every decoded token, and every
 repair edit, must keep the completion a prefix of the schema. It enforces structure and scope (key
@@ -54,6 +66,7 @@ LIT = re.compile(r"(\d+)(n|\.\d+|usd|eur)?")
 LIT_TYPE = {None: U32, "n": NAT, "usd": USD, "eur": EUR}
 SUFFIX_OK = re.compile(r'(?:n|\.\d*|usd?|eur)?(?:"[,}\]\s]*)?')
 TYPE_SLOT = re.compile(r'"(?:type|out_type)":\s*"$')
+INPUT_TYPE_SLOT = re.compile(r'\{\s*"id":\s*"([^"]*)",\s*"type":\s*"(\w*)$')  # an input's type, so far
 
 
 def lit_type(s):
@@ -653,8 +666,10 @@ class TypedJSONDAGCartridge(Cartridge):
     def __init__(self, token_texts, encode=None, special_ids=(), n_slots=64, pin_inputs=True,
                  apply_forward_mask=False, mask_impl="incremental"):
         assert mask_impl in ("incremental", "reparse"), mask_impl
+        assert pin_inputs in (True, False, "self"), pin_inputs
         self.texts = token_texts
-        self.pin_inputs = pin_inputs  # input types are the prompt's contract: never edit them
+        self.pin_inputs = pin_inputs  # True: the task's input contract; "self": as written; False: free
+        self.contract = None  # {input id: type index} of the bound task (pin_inputs=True)
         self.apply_forward_mask = apply_forward_mask  # decode inside the schema (SchemaPrefix)
         self.mask_impl = mask_impl  # "reparse": the v0.2 acceptor, re-parsing the completion each query
         self._trail = SchemaTrail(token_texts)
@@ -670,6 +685,9 @@ class TypedJSONDAGCartridge(Cartridge):
         self._g_type = self._tcm.G_type(k=None)
         bare = torch.tensor([t == t.lstrip(' \t\n"') for t in token_texts])
         self._g_type[~bare] = float("-inf")
+        self._g_stated = {(k, ""): self._tcm.G_type(k=k) for k in range(len(TYPES))}  # (type, typed so far)
+        for g in self._g_stated.values():
+            g[~bare] = float("-inf")
 
     @property
     def tcm(self):
@@ -726,8 +744,44 @@ class TypedJSONDAGCartridge(Cartridge):
         self.mask_calls += 1
         return ok
 
+    def bind_task(self, task):
+        if self.pin_inputs is True:
+            self.contract = {x: TYPES.index(T) for x, T in zip(task["inputs"], task["types"])}
+
+    def contract_ok(self, tokens):
+        """Every input the bound task names is declared with its stated type (True with no contract)."""
+        if not self.contract:
+            return True
+        try:
+            obj = json.loads(self.text(tokens)[:json_end(self.text(tokens))])
+            declared = {i["id"]: i["type"] for i in obj["inputs"]}
+        except Exception:  # noqa: BLE001  (not a document: the reference checker rejects it anyway)
+            return True
+        return all(declared[x] == TYPES[k] for x, k in self.contract.items() if x in declared)
+
+    def _stated(self, k, typed):
+        """Mask for the next token of an input declared with type k, `typed` written so far: the
+        rest of the name, then the closing quote."""
+        if (k, typed) not in self._g_stated:
+            rest = TYPES[k][len(typed):]
+            ok = [bool(t) and i not in self._special and (rest.startswith(t) if rest and len(t) <= len(rest)
+                                                          else t.startswith(rest + '"'))
+                  for i, t in enumerate(self.texts)]
+            g = torch.full((len(self.texts),), float("-inf"))
+            g[torch.tensor(ok)] = 0.0
+            self._g_stated[k, typed] = g
+        return self._g_stated[k, typed]
+
     def logits_processor(self, tokens, z):
-        """Schema-level constrained decoding: a type slot admits only the five type names."""
+        """Schema-level constrained decoding: a type slot admits only the five type names; with a
+        contract and the forward mask, an input the task names is held to its stated type."""
+        if self.contract and self.apply_forward_mask:
+            text = self.text(tokens)
+            m = INPUT_TYPE_SLOT.search(text)
+            if m and m.group(1) in self.contract and '"nodes"' not in text:
+                k = self.contract[m.group(1)]
+                if TYPES[k].startswith(m.group(2)):
+                    return z + self._stated(k, m.group(2))
         tail = "".join(self.texts[i] for i in as_list(tokens)[-6:])
         return z + self._g_type if TYPE_SLOT.search(tail) else z
 
@@ -760,8 +814,14 @@ class TypedJSONDAGCartridge(Cartridge):
                 hard(None, "bad input")
                 continue
             self._declare(lx, tok, slot, inp["id"], inp["type"], ty, hard)
-            if self.pin_inputs:
-                lx.frozen.add(tok(inp["type"].off))
+            t_type = tok(inp["type"].off)
+            stated = (self.contract or {}).get(str(inp["id"])) if self.pin_inputs is True else None
+            if stated is not None:  # the task's contract: check the written type against it
+                lx.ops.append(Op(t_type, CHECK_VAR, slot(inp["id"]), stated, tag="input contract"))
+                if ty(inp["type"]) == stated:
+                    lx.frozen.add(t_type)
+            elif self.pin_inputs:
+                lx.frozen.add(t_type)
             declared.add(str(inp["id"]))
         for node in obj.get("nodes", []) if isinstance(obj.get("nodes"), list) else []:
             if not isinstance(node, dict) or not isinstance(node.get("id"), S):

@@ -1,0 +1,20 @@
+{
+ "affected_tasks": {},
+ "n_left_out": 0,
+ "latency": {
+  "ttso_pinned": {
+   "mean_all_s": 8.258849999999999,
+   "mean_s": 8.258849999999999
+  },
+  "ttso_pinned_masked": {
+   "mean_all_s": 6.8967,
+   "mean_s": 6.8967
+  },
+  "greedy": {
+   "mean_s": 5.8871
+  },
+  "greedy_masked": {
+   "mean_s": 5.52395
+  }
+ }
+}

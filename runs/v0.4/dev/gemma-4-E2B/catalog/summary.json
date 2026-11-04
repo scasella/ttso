@@ -1,0 +1,215 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy",
+  "best_of_n",
+  "best_of_2_full",
+  "local",
+  "upstream",
+  "smart",
+  "smart_pinned"
+ ],
+ "greedy": {
+  "valid": 1,
+  "correct": 1,
+  "faithful": 1,
+  "correct_5": 1,
+  "faithful_5": 1,
+  "faithful_wilson95": [
+   0.0089,
+   0.2361
+  ],
+  "faithful_5_wilson95": [
+   0.0089,
+   0.2361
+  ],
+  "latency_mean_s": 2.5884
+ },
+ "best_of_n": {
+  "valid": 2,
+  "correct": 2,
+  "faithful": 2,
+  "correct_5": 2,
+  "faithful_5": 2,
+  "faithful_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "faithful_5_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "tokens_total": 2175,
+  "samples": {
+   "tasks_sampled": 19,
+   "total": 47,
+   "complete": 29,
+   "truncated": 18,
+   "capped": 0,
+   "complete_per_sampled_task": 1.5263157894736843,
+   "truncated_per_sampled_task": 0.9473684210526315,
+   "tasks_with_no_complete_sample": 8
+  }
+ },
+ "best_of_2_full": {
+  "valid": 3,
+  "correct": 3,
+  "faithful": 2,
+  "correct_5": 3,
+  "faithful_5": 2,
+  "faithful_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "faithful_5_wilson95": [
+   0.0279,
+   0.301
+  ],
+  "tokens_total": 2363,
+  "samples": {
+   "tasks_sampled": 19,
+   "total": 38,
+   "complete": 38,
+   "truncated": 0,
+   "capped": 0,
+   "complete_per_sampled_task": 2.0,
+   "truncated_per_sampled_task": 0.0,
+   "tasks_with_no_complete_sample": 0
+  }
+ },
+ "local": {
+  "valid": 5,
+  "correct": 3,
+  "faithful": 3,
+  "correct_5": 3,
+  "faithful_5": 3,
+  "faithful_wilson95": [
+   0.0524,
+   0.3604
+  ],
+  "faithful_5_wilson95": [
+   0.0524,
+   0.3604
+  ],
+  "extra_tokens_total": 2372,
+  "latency_mean_s": 7.847700000000001,
+  "latency_max_s": 28.507,
+  "same_greedy": true,
+  "rewinds": 54,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 54,
+   "same_diagnosis": 54,
+   "same_edit": 54,
+   "deltanet_ms": 0.36963499938051597,
+   "symbolic_ms": 0.01527240803827428,
+   "main": "deltanet"
+  }
+ },
+ "upstream": {
+  "valid": 7,
+  "correct": 6,
+  "faithful": 1,
+  "correct_5": 6,
+  "faithful_5": 1,
+  "faithful_wilson95": [
+   0.0089,
+   0.2361
+  ],
+  "faithful_5_wilson95": [
+   0.0089,
+   0.2361
+  ],
+  "extra_tokens_total": 2252,
+  "latency_mean_s": 7.43805,
+  "latency_max_s": 26.49,
+  "same_greedy": true,
+  "rewinds": 50,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 50,
+   "same_diagnosis": 50,
+   "same_edit": 50,
+   "deltanet_ms": 1.1931441799970344,
+   "symbolic_ms": 0.018359179375693202,
+   "main": "deltanet"
+  }
+ },
+ "smart": {
+  "valid": 7,
+  "correct": 6,
+  "faithful": 1,
+  "correct_5": 6,
+  "faithful_5": 1,
+  "faithful_wilson95": [
+   0.0089,
+   0.2361
+  ],
+  "faithful_5_wilson95": [
+   0.0089,
+   0.2361
+  ],
+  "extra_tokens_total": 2252,
+  "latency_mean_s": 7.46075,
+  "latency_max_s": 26.773,
+  "same_greedy": true,
+  "rewinds": 50,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 50,
+   "same_diagnosis": 50,
+   "same_edit": 50,
+   "deltanet_ms": 1.083083301782608,
+   "symbolic_ms": 0.01706837851088494,
+   "main": "deltanet"
+  }
+ },
+ "smart_pinned": {
+  "valid": 7,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "extra_tokens_total": 2126,
+  "latency_mean_s": 7.1806,
+  "latency_max_s": 27.792,
+  "same_greedy": true,
+  "rewinds": 53,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 53,
+   "same_diagnosis": 53,
+   "same_edit": 53,
+   "deltanet_ms": 1.157090434132425,
+   "symbolic_ms": 0.014834869806742612,
+   "main": "deltanet"
+  }
+ },
+ "peak_mps_allocated_gb": 4.586249728,
+ "peak_rss_gb": 2.54763008,
+ "model": "google/gemma-4-E2B",
+ "revision": "433813a669639fd7eaa83155828e9000ed357d53",
+ "dtype": "bfloat16",
+ "split": "dev",
+ "n_tasks": 20,
+ "wall_s": 670.0,
+ "max_new_tokens": 256,
+ "k_max": 3,
+ "device_weights_gib": 4.246382236480713,
+ "mapped_gib": 4.375,
+ "prompt": "raw",
+ "torch": "2.15.0",
+ "mps": true
+}

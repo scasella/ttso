@@ -24,12 +24,17 @@ Outcomes:
             item is a parameter of a non-main def and is used in a non-main body, non-main bodies
             hold no number literals, and main passes every catalog value;
   faithful  correct, and every catalog item's parameter keeps the type the catalog states.
+correct / faithful judge the one call the prompt states (Correct_1 / Faithful_1). correct_5 /
+faithful_5 (v0.4, primary) also require the def to compute the task's sum on 5 catalogs: the stated
+one and 4 with values of growing magnitude (`vectors`), passed to the def main calls by parameter
+name.
 """
 
 import random
 from collections import Counter
 
-from ttso.cartridges.bendlite import parse
+from ttso.cartridges.bendlite import _eval, parse
+from ttso.engine.benchmark import task_rng
 
 NAMES = ["price", "qty", "fee", "tax", "bonus", "rate", "count", "units", "base", "extra",
          "days", "hours", "limit", "stock", "refund", "tip", "level", "boost", "shift", "weight",
@@ -78,7 +83,7 @@ def catalog_task(rng):
            f"  {fn}({', '.join(f'{vals[x]}n' if x in nats else str(vals[x]) for x in order)})\n")
     return {"text": text, "items": order, "types": [types[x] for x in order],
             "values": [vals[x] for x in order], "expected": sum(vals[x] for x in terms) % 2**32,
-            "reference": ref}
+            "reference": ref, "terms": terms}
 
 
 def make_tasks(n, seed, exclude=()):
@@ -103,6 +108,12 @@ def heldout_tasks():
 def messages(task):
     return [{"role": "system", "content": SYSTEM},
             {"role": "user", "content": f"Write a BendLite program. {task['text']}{INSTRUCTION}"}]
+
+
+def raw_prompt(task):
+    """The same content as a plain document, for a base model with no chat format (v0.4): the system
+    text, whose worked example ends in "Example program:", then the task and "Program:"."""
+    return f"{SYSTEM}\nTask: Write a BendLite program. {task['text']}{INSTRUCTION}\nProgram:\n"
 
 
 def _operands(body):
@@ -131,6 +142,49 @@ def interface_ok(task, text):
     return all(have[v] >= c for v, c in Counter(task["values"]).items())
 
 
+NAT_MAGNITUDES = ((2, 9), (10, 40), (41, 99), (100, 250))
+U32_MAGNITUDES = ((10, 99), (100, 999), (1000, 9999), (2, 9))
+
+
+def vectors(task):
+    """5 catalogs {item: value}: the stated one, then 4 with values of different magnitudes (Nat
+    counts 2-9, 10-40, 41-99, 100-250; U32 values 10-99, 100-999, 1000-9999, 2-9), distinct within
+    a catalog, >= 2, and never an item's stated value."""
+    rng, out = task_rng(task), [dict(zip(task["items"], task["values"]))]
+    for nat, u32 in zip(NAT_MAGNITUDES, U32_MAGNITUDES):
+        vec = {}
+        for x, T in zip(task["items"], task["types"]):
+            lo, hi = nat if T == "Nat" else u32
+            vec[x] = rng.choice([v for v in range(lo, hi + 1) if v not in vec.values() and v != out[0][x]])
+        out.append(vec)
+    return out
+
+
+def formula_value(task, vec):
+    return sum(vec[x] for x in task["terms"]) % 2**32
+
+
+def vectors_passed(task, text):
+    """How many of the 5 catalogs the def main calls maps to the task's sum: each catalog value is
+    passed to the parameter of the same name (other parameters keep main's literal)."""
+    fns, err = parse(text)
+    sig = {f.name: f for f in fns}
+    main = sig.get("main")
+    if err is not None or main is None or main.body.get("kind") != "call" or main.body["fn"] not in sig:
+        return 0
+    g = sig[main.body["fn"]]
+    if len(main.body["args"]) != len(g.params) or any(a["kind"] != "lit" for a in main.body["args"]):
+        return 0
+    passed = 0
+    for vec in vectors(task):
+        env = {p: vec.get(p, a["value"]) for a, (p, _, _) in zip(main.body["args"], g.params)}
+        try:
+            passed += _eval(sig, g.name, env) == formula_value(task, vec)
+        except (KeyError, RecursionError):
+            pass
+    return passed
+
+
 def faithful_types(task, text):
     fns, _ = parse(text)
     declared = {}
@@ -143,14 +197,22 @@ def faithful_types(task, text):
 
 class CatalogSuite:
     """Chat prompts (thinking off, as in the study) and the catalog outcomes for benchmark.run.
-    The prompt uses the backend's HuggingFace tokenizer (backend.tok) for the chat template."""
+    The prompt uses the backend's HuggingFace tokenizer (backend.tok) for the chat template.
+    raw=True gives a base model the plain-document prompt (raw_prompt) instead."""
+
+    def __init__(self, raw=False):
+        self.raw = raw
 
     def prompt_ids(self, backend, task):
+        if self.raw:
+            return backend.prompt_ids(raw_prompt(task))
         text = backend.tok.apply_chat_template(messages(task), add_generation_prompt=True, tokenize=False,
                                                enable_thinking=False)
-        return backend.encode(text)
+        return backend.prompt_ids(text)
 
     def outcome(self, task, verdict, text):
         ok = verdict.valid and verdict.value == task["expected"] and interface_ok(task, text)
-        return {"valid": verdict.valid, "correct": ok, "faithful": ok and faithful_types(task, text),
-                "error": verdict.error}
+        f1 = ok and faithful_types(task, text)
+        k = vectors_passed(task, text) if ok else 0
+        return {"valid": verdict.valid, "correct": ok, "faithful": f1, "correct_5": ok and k == 5,
+                "faithful_5": f1 and k == 5, "vectors_passed": k, "error": verdict.error}

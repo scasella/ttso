@@ -1,0 +1,32 @@
+W1104 06:46:10.794000 16909 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights:   0%|          | 1/310 [00:00<01:08,  4.51it/s]Loading weights:  78%|███████▊  | 242/310 [00:00<00:00, 940.75it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 926.81it/s]
+[ 0] greedy x | greedy_masked x | ttso_pinned v r=2 +87 | ttso_pinned_masked v r=2 +87 | ttso_unpinned x r=3 +309 | best_of_n x | best_of_n_masked x
+[ 1] greedy x | greedy_masked v | ttso_pinned x r=3 +273 | ttso_pinned_masked v r=0 +0 | ttso_unpinned x r=3 +273 | best_of_n x | best_of_n_masked v
+[ 2] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +134 | ttso_pinned_masked F r=3 +119 | ttso_unpinned C r=3 +176 | best_of_n x | best_of_n_masked x
+[ 4] greedy x | greedy_masked x | ttso_pinned v r=2 +22 | ttso_pinned_masked F r=1 +9 | ttso_unpinned v r=2 +22 | best_of_n x | best_of_n_masked x
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +242 | ttso_pinned_masked x r=3 +242 | ttso_unpinned x r=3 +280 | best_of_n x | best_of_n_masked x
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 7] greedy x | greedy_masked x | ttso_pinned F r=3 +176 | ttso_pinned_masked F r=3 +172 | ttso_unpinned C r=3 +175 | best_of_n x | best_of_n_masked x
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +559 | ttso_pinned_masked v r=2 +113 | ttso_unpinned v r=3 +221 | best_of_n x | best_of_n_masked x
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +209 | ttso_pinned_masked x r=3 +209 | ttso_unpinned x r=3 +287 | best_of_n x | best_of_n_masked x
+[10] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +236 | ttso_pinned_masked x r=3 +238 | ttso_unpinned C r=3 +264 | best_of_n x | best_of_n_masked x
+[12] greedy x | greedy_masked x | ttso_pinned F r=2 +87 | ttso_pinned_masked F r=2 +87 | ttso_unpinned C r=1 +107 | best_of_n x | best_of_n_masked x
+[13] greedy x | greedy_masked v | ttso_pinned v r=1 +10 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=1 +10 | best_of_n x | best_of_n_masked v
+[14] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[15] greedy x | greedy_masked x | ttso_pinned F r=3 +116 | ttso_pinned_masked F r=3 +116 | ttso_unpinned x r=3 +275 | best_of_n x | best_of_n_masked x
+[16] greedy x | greedy_masked x | ttso_pinned C r=1 +48 | ttso_pinned_masked C r=1 +48 | ttso_unpinned C r=2 +231 | best_of_n x | best_of_n_masked x
+[17] greedy x | greedy_masked v | ttso_pinned v r=2 +11 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=2 +11 | best_of_n x | best_of_n_masked v
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[19] greedy x | greedy_masked x | ttso_pinned F r=3 +142 | ttso_pinned_masked F r=3 +123 | ttso_unpinned C r=3 +183 | best_of_n x | best_of_n_masked x
+
+[symbolic] dev tasks: 209 repair rounds across 6 regimes; 0 differ
+  contract_smart: 35/35 same edit; diagnosis 2.4 ms (DeltaNet) vs 0.02 ms (symbolic)
+  contract_smart_masked: 24/24 same edit; diagnosis 3.5 ms (DeltaNet) vs 0.02 ms (symbolic)
+  self_smart: 37/37 same edit; diagnosis 2.4 ms (DeltaNet) vs 0.02 ms (symbolic)
+  unpinned_smart: 38/38 same edit; diagnosis 2.6 ms (DeltaNet) vs 0.02 ms (symbolic)
+  local: 37/37 same edit; diagnosis 0.8 ms (DeltaNet) vs 0.02 ms (symbolic)
+  upstream: 38/38 same edit; diagnosis 2.6 ms (DeltaNet) vs 0.02 ms (symbolic)
+.
+1 passed, 3 deselected in 1083.49s (0:18:03)

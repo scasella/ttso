@@ -21,7 +21,9 @@ def _regimes(be, names=None, **kw):
     mk = lambda **k: TypedJSONDAGCartridge(be.token_texts(), encode=be.encode,
                                            special_ids=sorted(be.eos_ids | set(getattr(be, "special_ids", []))),
                                            **k, **kw)
-    r = {"ttso_pinned": (mk(), "smart"), "ttso_pinned_masked": (mk(apply_forward_mask=True), "smart"),
+    # the v0.2 arms: inputs pinned as written ("self"), not to the task contract (v0.4's default)
+    r = {"ttso_pinned": (mk(pin_inputs="self"), "smart"),
+         "ttso_pinned_masked": (mk(pin_inputs="self", apply_forward_mask=True), "smart"),
          "ttso_unpinned": (mk(pin_inputs=False), "smart")}
     return {k: v for k, v in r.items() if names is None or k in names}
 

@@ -1,0 +1,215 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy",
+  "best_of_n",
+  "best_of_2_full",
+  "local",
+  "upstream",
+  "smart",
+  "smart_pinned"
+ ],
+ "greedy": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "latency_mean_s": 9.3812
+ },
+ "best_of_n": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "tokens_total": 12358,
+  "samples": {
+   "tasks_sampled": 20,
+   "total": 63,
+   "complete": 10,
+   "truncated": 20,
+   "capped": 33,
+   "complete_per_sampled_task": 0.5,
+   "truncated_per_sampled_task": 1.0,
+   "tasks_with_no_complete_sample": 13
+  }
+ },
+ "best_of_2_full": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "tokens_total": 9585,
+  "samples": {
+   "tasks_sampled": 20,
+   "total": 40,
+   "complete": 6,
+   "truncated": 0,
+   "capped": 34,
+   "complete_per_sampled_task": 0.3,
+   "truncated_per_sampled_task": 0.0,
+   "tasks_with_no_complete_sample": 15
+  }
+ },
+ "local": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "extra_tokens_total": 12358,
+  "latency_mean_s": 32.819,
+  "latency_max_s": 84.514,
+  "same_greedy": true,
+  "rewinds": 60,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.12401458419238527,
+   "symbolic_ms": 0.01143606835588192,
+   "main": "deltanet"
+  }
+ },
+ "upstream": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "extra_tokens_total": 12358,
+  "latency_mean_s": 30.832600000000003,
+  "latency_max_s": 46.854,
+  "same_greedy": true,
+  "rewinds": 60,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.0658889184705913,
+   "symbolic_ms": 0.009346549146963904,
+   "main": "deltanet"
+  }
+ },
+ "smart": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "extra_tokens_total": 12358,
+  "latency_mean_s": 30.7003,
+  "latency_max_s": 44.729,
+  "same_greedy": true,
+  "rewinds": 60,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.06197982972177366,
+   "symbolic_ms": 0.009277116138643274,
+   "main": "deltanet"
+  }
+ },
+ "smart_pinned": {
+  "valid": 0,
+  "correct": 0,
+  "faithful": 0,
+  "correct_5": 0,
+  "faithful_5": 0,
+  "faithful_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "faithful_5_wilson95": [
+   0.0,
+   0.1611
+  ],
+  "extra_tokens_total": 12358,
+  "latency_mean_s": 30.4418,
+  "latency_max_s": 39.327,
+  "same_greedy": true,
+  "rewinds": 60,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.05894024895193676,
+   "symbolic_ms": 0.008695866078293571,
+   "main": "deltanet"
+  }
+ },
+ "peak_mps_allocated_gb": 4.593751552,
+ "peak_rss_gb": 2.6865664,
+ "model": "google/gemma-4-E2B",
+ "revision": "433813a669639fd7eaa83155828e9000ed357d53",
+ "dtype": "bfloat16",
+ "split": "dev",
+ "n_tasks": 20,
+ "wall_s": 2769.7,
+ "max_new_tokens": 256,
+ "k_max": 3,
+ "device_weights_gib": 4.246382236480713,
+ "mapped_gib": 4.375,
+ "chat_template_from": "google/gemma-4-E2B-it",
+ "torch": "2.15.0",
+ "mps": true
+}

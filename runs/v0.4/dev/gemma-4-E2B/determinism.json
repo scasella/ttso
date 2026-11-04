@@ -1,0 +1,74 @@
+[
+ {
+  "suite": "json",
+  "regime": "ttso_pinned_masked",
+  "i": 0,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 2
+ },
+ {
+  "suite": "json",
+  "regime": "ttso_pinned_masked",
+  "i": 1,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 0
+ },
+ {
+  "suite": "json",
+  "regime": "ttso_pinned_masked",
+  "i": 2,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 0
+ },
+ {
+  "suite": "json",
+  "regime": "ttso_pinned_masked",
+  "i": 3,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 3
+ },
+ {
+  "suite": "catalog",
+  "regime": "smart",
+  "i": 0,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 3
+ },
+ {
+  "suite": "catalog",
+  "regime": "smart",
+  "i": 1,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 3
+ },
+ {
+  "suite": "catalog",
+  "regime": "smart",
+  "i": 2,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 3
+ },
+ {
+  "suite": "catalog",
+  "regime": "smart",
+  "i": 3,
+  "greedy_same": true,
+  "fork_same": true,
+  "fresh_same": true,
+  "rounds": 3
+ }
+]

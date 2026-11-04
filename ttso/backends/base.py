@@ -32,6 +32,10 @@ class Backend(ABC):
     def decode(self, ids):
         ...
 
+    def prompt_ids(self, text):
+        """A prompt's token ids (a backend whose model needs a BOS token adds it here)."""
+        return self.encode(text)
+
     @abstractmethod
     def token_texts(self):
         """Decoded text of every token id."""

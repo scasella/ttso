@@ -58,6 +58,13 @@ class Cartridge(ABC):
         """Constrained-decoding hook applied before picking each token (identity by default)."""
         return z
 
+    def bind_task(self, task):
+        """Called with each benchmark task before it is decoded (no-op by default)."""
+
+    def contract_ok(self, tokens):
+        """The repair loop's extra stopping test beyond check() (a task contract; True by default)."""
+        return True
+
     def compile(self, device="cpu"):
         return CompiledDeltaNet(self.tcm.W_decl, self.tcm.W_lit, self.n_slots).to(device)
 

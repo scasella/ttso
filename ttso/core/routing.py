@@ -1,7 +1,8 @@
 """Diagnosis of the first failed check and edit-site routing (Smart, Upstream, LocalOnly, Blind).
 
 diagnose(): runs the cartridge's lexer and the verifier, backpropagates the first failed check into
-the cached logits and returns the flagged tokens T_causal = {t <= t_error : ||dL/dz_t||_inf > eps},
+the cached logits and returns the flagged tokens (core/symbolic.py derives the same diagnosis from a
+provenance table, without gradients; the router takes either) T_causal = {t <= t_error : ||dL/dz_t||_inf > eps},
 the symbol s* of the check, its declaration token t_decl (the DECLARE the check read) and, for a
 CHECK_CALL, the call-site literal token t_call. A hard error (parse failure, undeclared name, arity)
 earlier than every failed check is reported as kind "hard" with no gradient.
@@ -52,6 +53,7 @@ class Diagnosis:
     grads: dict = field(default_factory=dict)
     consistent_uses: int = 0
     lexed: object = None
+    constructive: dict | None = None  # symbolic verifier: t -> ("decl" | "lit", type), instead of grads
 
 
 @dataclass
@@ -78,8 +80,8 @@ class RepairState:
         self.tried_decl = {s for s in self.tried_decl if s <= t}
 
 
-def diagnose(net, cart, tokens, logits, dtype=torch.float32, detach_state=False, eps=0.0):
-    lx = cart.lex(tokens)
+def diagnose(net, cart, tokens, logits, dtype=torch.float32, detach_state=False, eps=0.0, lexed=None):
+    lx = lexed if lexed is not None else cart.lex(tokens)
     G = first_failure_gradients(net, tokens, lx.ops, logits, dtype=dtype, detach_state=detach_state, eps=eps)
     j = G.check
     t_check = G.trace.checks[j].op.t if j is not None else None
@@ -160,8 +162,13 @@ class Router:
     def _gradient_edit(self, d, tokens, logits, state, t, case, route):
         site = d.lexed.sites.get(t, "other")
         allowed = self._allowed(tokens, t, site)
-        new = gradient_pick(logits[t], d.grads[t], allowed, self._banned(state, tokens, t, site),
-                            self._accept(tokens, t))
+        banned, accept = self._banned(state, tokens, t, site), self._accept(tokens, t)
+        if d.constructive is not None:  # symbolic provenance: the most likely constructive token
+            kind, k = d.constructive[t]
+            fits = (self.tcm.type_of if kind == "decl" else self.tcm.lit_of) == k
+            new = best_pick(logits[t], allowed & fits, banned, accept)
+        else:
+            new = gradient_pick(logits[t], d.grads[t], allowed, banned, accept)
         return None if new is None else Edit(t, int(tokens[t]), new, case, route, site)
 
     def _local_edit(self, d, tokens, logits, state, t, case="C", route="local"):

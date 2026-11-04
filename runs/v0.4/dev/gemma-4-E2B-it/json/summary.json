@@ -1,0 +1,224 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy",
+  "greedy_masked",
+  "best_of_n",
+  "best_of_n_masked",
+  "best_of_2_full",
+  "best_of_2_full_masked",
+  "ttso_pinned",
+  "ttso_pinned_masked"
+ ],
+ "greedy": {
+  "valid": 7,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "latency_mean_s": 5.8871
+ },
+ "greedy_masked": {
+  "valid": 10,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "latency_mean_s": 5.52395
+ },
+ "best_of_n": {
+  "valid": 7,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "tokens_total": 1096,
+  "samples": {
+   "tasks_sampled": 13,
+   "total": 15,
+   "complete": 2,
+   "truncated": 13,
+   "capped": 0,
+   "complete_per_sampled_task": 0.15384615384615385,
+   "truncated_per_sampled_task": 1.0,
+   "tasks_with_no_complete_sample": 11
+  }
+ },
+ "best_of_n_masked": {
+  "valid": 10,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "tokens_total": 674,
+  "samples": {
+   "tasks_sampled": 10,
+   "total": 10,
+   "complete": 0,
+   "truncated": 10,
+   "capped": 0,
+   "complete_per_sampled_task": 0.0,
+   "truncated_per_sampled_task": 1.0,
+   "tasks_with_no_complete_sample": 10
+  }
+ },
+ "best_of_2_full": {
+  "valid": 7,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "tokens_total": 3370,
+  "samples": {
+   "tasks_sampled": 13,
+   "total": 26,
+   "complete": 26,
+   "truncated": 0,
+   "capped": 0,
+   "complete_per_sampled_task": 2.0,
+   "truncated_per_sampled_task": 0.0,
+   "tasks_with_no_complete_sample": 0
+  }
+ },
+ "best_of_2_full_masked": {
+  "valid": 10,
+  "correct": 5,
+  "faithful": 5,
+  "correct_5": 5,
+  "faithful_5": 5,
+  "faithful_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "faithful_5_wilson95": [
+   0.1119,
+   0.4687
+  ],
+  "tokens_total": 2771,
+  "samples": {
+   "tasks_sampled": 10,
+   "total": 20,
+   "complete": 20,
+   "truncated": 0,
+   "capped": 0,
+   "complete_per_sampled_task": 2.0,
+   "truncated_per_sampled_task": 0.0,
+   "tasks_with_no_complete_sample": 0
+  }
+ },
+ "ttso_pinned": {
+  "valid": 18,
+  "correct": 12,
+  "faithful": 12,
+  "correct_5": 10,
+  "faithful_5": 10,
+  "faithful_wilson95": [
+   0.3866,
+   0.7812
+  ],
+  "faithful_5_wilson95": [
+   0.2993,
+   0.7007
+  ],
+  "extra_tokens_total": 1096,
+  "latency_mean_s": 8.258849999999999,
+  "latency_max_s": 21.099,
+  "same_greedy": true,
+  "rewinds": 18,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 18,
+   "same_diagnosis": 18,
+   "same_edit": 18,
+   "deltanet_ms": 8.616884334413852,
+   "symbolic_ms": 0.04159499884634796,
+   "main": "deltanet"
+  }
+ },
+ "ttso_pinned_masked": {
+  "valid": 20,
+  "correct": 14,
+  "faithful": 14,
+  "correct_5": 11,
+  "faithful_5": 11,
+  "faithful_wilson95": [
+   0.481,
+   0.8545
+  ],
+  "faithful_5_wilson95": [
+   0.3421,
+   0.7418
+  ],
+  "extra_tokens_total": 674,
+  "latency_mean_s": 6.8967,
+  "latency_max_s": 15.077,
+  "same_greedy": true,
+  "rewinds": 12,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 12,
+   "same_diagnosis": 12,
+   "same_edit": 12,
+   "deltanet_ms": 4.347746502996112,
+   "symbolic_ms": 0.03966999793192372,
+   "main": "deltanet"
+  }
+ },
+ "peak_mps_allocated_gb": 4.623061504,
+ "peak_rss_gb": 1.725300736,
+ "model": "google/gemma-4-E2B-it",
+ "revision": "4adf15748de9e1a0097b6274cee9c15836c41c37",
+ "dtype": "bfloat16",
+ "split": "dev",
+ "n_tasks": 20,
+ "wall_s": 680.5,
+ "max_new_tokens": 320,
+ "k_max": 3,
+ "device_weights_gib": 4.246382236480713,
+ "mapped_gib": 4.375,
+ "chat_template_from": null,
+ "torch": "2.15.0",
+ "mps": true
+}

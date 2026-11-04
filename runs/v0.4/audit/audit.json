@@ -1,0 +1,903 @@
+[
+ {
+  "run": "v0.2 base",
+  "path": "runs/v0.2/base",
+  "model": "Qwen/Qwen3-0.6B-Base",
+  "suite": "json",
+  "n": 60,
+  "counts": {
+   "greedy": {
+    "valid": 23,
+    "correct": 15,
+    "correct_5": 15,
+    "faithful": 15,
+    "faithful_5": 15
+   },
+   "greedy_masked": {
+    "valid": 29,
+    "correct": 15,
+    "correct_5": 15,
+    "faithful": 15,
+    "faithful_5": 15
+   },
+   "best_of_n": {
+    "valid": 23,
+    "correct": 15,
+    "correct_5": 15,
+    "faithful": 15,
+    "faithful_5": 15
+   },
+   "best_of_n_masked": {
+    "valid": 30,
+    "correct": 15,
+    "correct_5": 15,
+    "faithful": 15,
+    "faithful_5": 15
+   },
+   "ttso_pinned": {
+    "valid": 44,
+    "correct": 27,
+    "correct_5": 23,
+    "faithful": 26,
+    "faithful_5": 22
+   },
+   "ttso_pinned_masked": {
+    "valid": 51,
+    "correct": 31,
+    "correct_5": 24,
+    "faithful": 30,
+    "faithful_5": 23
+   },
+   "ttso_unpinned": {
+    "valid": 50,
+    "correct": 35,
+    "correct_5": 35,
+    "faithful": 15,
+    "faithful_5": 15
+   }
+  },
+  "sanity_mismatches": [],
+  "coincidences": [
+   {
+    "i": 11,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 boxes and a Nat refund into a U32 sum, then take the smaller of that sum and a U32 hours. Call with boxes 12, refund 25 and hours 24.",
+    "text": "{\"inputs\": [{\"id\": \"boxes\", \"type\": \"U32\"}, {\"id\": \"refund\", \"type\": \"Nat\"}, {\"id\": \"hours\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"boxes\"}, {\"convert\": \"to_u32(refund)\"}, {\"ref\": \"hours\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}]}, {\"id\": \"result2\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"result\"}, {\"ref\": \"hours\"}]}], \"output\": \"result2\", \"call\": {\"boxes\": \"12\", \"refund\": \"25n\", \"hours\": \"24\"}}\n\n"
+   },
+   {
+    "i": 19,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 hours and a Nat items into a U32 sum, then take the smaller of that sum and a U32 fee. Call with hours 34, items 33 and fee 7.",
+    "text": "{\"inputs\": [{\"id\": \"hours\", \"type\": \"U32\"}, {\"id\": \"items\", \"type\": \"Nat\"}, {\"id\": \"fee\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"hours\"}, {\"convert\": \"to_u32(items)\"}, {\"lit\": \"7\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"fee\"}]}], \"output\": \"result\", \"call\": {\"hours\": \"34\", \"items\": \"33n\", \"fee\": \"7\"}}\n\n"
+   },
+   {
+    "i": 27,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 orders and a Nat parts into a U32 sum, then take the smaller of that sum and a U32 stock. Call with orders 40, parts 22 and stock 33.",
+    "text": "{\"inputs\": [{\"id\": \"orders\", \"type\": \"U32\"}, {\"id\": \"parts\", \"type\": \"Nat\"}, {\"id\": \"stock\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"orders\"}, {\"convert\": \"to_u32(parts)\"}, {\"ref\": \"stock\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"stock\"}]}], \"output\": \"result\", \"call\": {\"orders\": \"40\", \"parts\": \"22n\", \"stock\": \"33\"}}\n\n"
+   },
+   {
+    "i": 39,
+    "arm": "ttso_pinned",
+    "vectors_passed": 3,
+    "task": "Add a U32 pallets and a Nat count into a U32 sum, then take the smaller of that sum and a U32 items. Call with pallets 52, count 32 and items 53.",
+    "text": "{\"inputs\": [{\"id\": \"pallets\", \"type\": \"U32\"}, {\"id\": \"count\", \"type\": \"Nat\"}, {\"id\": \"items\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"pallets\"}, {\"convert\": \"to_u32(count)\"}, {\"ref\": \"items\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"items\"}]}], \"output\": \"result\", \"call\": {\"pallets\": \"52\", \"count\": \"32n\", \"items\": \"53\"}}\n\n"
+   },
+   {
+    "i": 39,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 pallets and a Nat count into a U32 sum, then take the smaller of that sum and a U32 items. Call with pallets 52, count 32 and items 53.",
+    "text": "{\"inputs\": [{\"id\": \"pallets\", \"type\": \"U32\"}, {\"id\": \"count\", \"type\": \"Nat\"}, {\"id\": \"items\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"pallets\"}, {\"convert\": \"to_u32(count)\"}, {\"ref\": \"items\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"items\"}]}], \"output\": \"result\", \"call\": {\"pallets\": \"52\", \"count\": \"32n\", \"items\": \"53\"}}\n\n"
+   },
+   {
+    "i": 43,
+    "arm": "ttso_pinned",
+    "vectors_passed": 3,
+    "task": "Add a U32 price and a Nat items into a U32 sum, then take the smaller of that sum and a U32 rent. Call with price 14, items 36 and rent 30.",
+    "text": "{\"inputs\": [{\"id\": \"price\", \"type\": \"U32\"}, {\"id\": \"items\", \"type\": \"Nat\"}, {\"id\": \"rent\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"price\"}, {\"convert\": \"to_u32(items)\"}, {\"ref\": \"rent\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"rent\"}]}], \"output\": \"result\", \"call\": {\"price\": \"14\", \"items\": \"36n\", \"rent\": \"30\"}}\n\n"
+   },
+   {
+    "i": 43,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 price and a Nat items into a U32 sum, then take the smaller of that sum and a U32 rent. Call with price 14, items 36 and rent 30.",
+    "text": "{\"inputs\": [{\"id\": \"price\", \"type\": \"U32\"}, {\"id\": \"items\", \"type\": \"Nat\"}, {\"id\": \"rent\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"price\"}, {\"convert\": \"to_u32(items)\"}, {\"ref\": \"rent\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"rent\"}]}], \"output\": \"result\", \"call\": {\"price\": \"14\", \"items\": \"36n\", \"rent\": \"30\"}}\n\n"
+   },
+   {
+    "i": 47,
+    "arm": "ttso_pinned",
+    "vectors_passed": 1,
+    "task": "Add a U32 count and a Nat rent into a U32 sum, then take the smaller of that sum and a U32 bonus. Call with count 59, rent 5 and bonus 12.",
+    "text": "{\"inputs\": [{\"id\": \"count\", \"type\": \"U32\"}, {\"id\": \"rent\", \"type\": \"Nat\"}, {\"id\": \"bonus\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"count\"}, {\"convert\": \"to_u32(rent)\"}, {\"ref\": \"bonus\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"lit\": \"12\"}]}], \"output\": \"result\", \"call\": {\"count\": \"59\", \"rent\": \"5n\", \"bonus\": \"12\"}}\n\n"
+   },
+   {
+    "i": 47,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 1,
+    "task": "Add a U32 count and a Nat rent into a U32 sum, then take the smaller of that sum and a U32 bonus. Call with count 59, rent 5 and bonus 12.",
+    "text": "{\"inputs\": [{\"id\": \"count\", \"type\": \"U32\"}, {\"id\": \"rent\", \"type\": \"Nat\"}, {\"id\": \"bonus\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"count\"}, {\"convert\": \"to_u32(rent)\"}, {\"ref\": \"bonus\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"lit\": \"12\"}]}], \"output\": \"result\", \"call\": {\"count\": \"59\", \"rent\": \"5n\", \"bonus\": \"12\"}}\n\n"
+   },
+   {
+    "i": 55,
+    "arm": "ttso_pinned",
+    "vectors_passed": 3,
+    "task": "Add a U32 pallets and a Nat items into a U32 sum, then take the smaller of that sum and a U32 level. Call with pallets 41, items 7 and level 28.",
+    "text": "{\"inputs\": [{\"id\": \"pallets\", \"type\": \"U32\"}, {\"id\": \"items\", \"type\": \"Nat\"}, {\"id\": \"level\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"pallets\"}, {\"convert\": \"to_u32(items)\"}, {\"lit\": \"7\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"level\"}]}], \"output\": \"result\", \"call\": {\"pallets\": \"41\", \"items\": \"7n\", \"level\": \"28\"}}\n\n"
+   },
+   {
+    "i": 55,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 pallets and a Nat items into a U32 sum, then take the smaller of that sum and a U32 level. Call with pallets 41, items 7 and level 28.",
+    "text": "{\"inputs\": [{\"id\": \"pallets\", \"type\": \"U32\"}, {\"id\": \"items\", \"type\": \"Nat\"}, {\"id\": \"level\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"sum\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"pallets\"}, {\"convert\": \"to_u32(items)\"}, {\"lit\": \"7\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"sum\"}, {\"ref\": \"level\"}]}], \"output\": \"result\", \"call\": {\"pallets\": \"41\", \"items\": \"7n\", \"level\": \"28\"}}\n\n"
+   }
+  ],
+  "family_faithful_1": {
+   "H1": {
+    "only_first": 11,
+    "only_second": 0,
+    "p": 0.0009765625,
+    "pair": [
+     "ttso_pinned",
+     "greedy"
+    ],
+    "p_holm": 0.001953125
+   },
+   "H2": {
+    "only_first": 11,
+    "only_second": 0,
+    "p": 0.0009765625,
+    "pair": [
+     "ttso_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 0.001953125
+   },
+   "H3": {
+    "only_first": 15,
+    "only_second": 0,
+    "p": 6.103515625e-05,
+    "pair": [
+     "ttso_pinned_masked",
+     "greedy_masked"
+    ],
+    "p_holm": 0.000244140625
+   },
+   "H4": {
+    "only_first": 15,
+    "only_second": 0,
+    "p": 6.103515625e-05,
+    "pair": [
+     "ttso_pinned_masked",
+     "best_of_n_masked"
+    ],
+    "p_holm": 0.000244140625
+   }
+  },
+  "family_faithful_5": {
+   "H1": {
+    "only_first": 7,
+    "only_second": 0,
+    "p": 0.015625,
+    "pair": [
+     "ttso_pinned",
+     "greedy"
+    ],
+    "p_holm": 0.03125
+   },
+   "H2": {
+    "only_first": 7,
+    "only_second": 0,
+    "p": 0.015625,
+    "pair": [
+     "ttso_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 0.03125
+   },
+   "H3": {
+    "only_first": 8,
+    "only_second": 0,
+    "p": 0.0078125,
+    "pair": [
+     "ttso_pinned_masked",
+     "greedy_masked"
+    ],
+    "p_holm": 0.03125
+   },
+   "H4": {
+    "only_first": 8,
+    "only_second": 0,
+    "p": 0.0078125,
+    "pair": [
+     "ttso_pinned_masked",
+     "best_of_n_masked"
+    ],
+    "p_holm": 0.03125
+   }
+  },
+  "best_of_n": {
+   "best_of_n": {
+    "tasks": 60,
+    "tasks_sampled": 37,
+    "samples_total": 54,
+    "samples_per_sampled_task": {
+     "1": 21,
+     "2": 15,
+     "3": 1
+    },
+    "budget_min": 10,
+    "budget_max": 328,
+    "budget_below_max_new": 36,
+    "tasks_with_no_complete_sample": 21,
+    "no_complete_sample_tasks": [
+     0,
+     5,
+     11,
+     12,
+     15,
+     17,
+     19,
+     24,
+     27,
+     28,
+     32,
+     33,
+     39,
+     40,
+     41,
+     43,
+     44,
+     48,
+     49,
+     55,
+     57
+    ]
+   },
+   "best_of_n_masked": {
+    "tasks": 60,
+    "tasks_sampled": 31,
+    "samples_total": 47,
+    "samples_per_sampled_task": {
+     "1": 16,
+     "2": 14,
+     "3": 1
+    },
+    "budget_min": 50,
+    "budget_max": 404,
+    "budget_below_max_new": 30,
+    "tasks_with_no_complete_sample": 16,
+    "no_complete_sample_tasks": [
+     0,
+     11,
+     12,
+     15,
+     19,
+     24,
+     27,
+     28,
+     32,
+     39,
+     40,
+     43,
+     44,
+     48,
+     55,
+     59
+    ]
+   }
+  }
+ },
+ {
+  "run": "v0.2 post",
+  "path": "runs/v0.2/post",
+  "model": "Qwen/Qwen3-0.6B",
+  "suite": "json",
+  "n": 20,
+  "counts": {
+   "greedy": {
+    "valid": 4,
+    "correct": 4,
+    "correct_5": 4,
+    "faithful": 4,
+    "faithful_5": 4
+   },
+   "greedy_masked": {
+    "valid": 5,
+    "correct": 4,
+    "correct_5": 4,
+    "faithful": 4,
+    "faithful_5": 4
+   },
+   "best_of_n": {
+    "valid": 4,
+    "correct": 4,
+    "correct_5": 4,
+    "faithful": 4,
+    "faithful_5": 4
+   },
+   "best_of_n_masked": {
+    "valid": 5,
+    "correct": 4,
+    "correct_5": 4,
+    "faithful": 4,
+    "faithful_5": 4
+   },
+   "ttso_pinned": {
+    "valid": 4,
+    "correct": 4,
+    "correct_5": 4,
+    "faithful": 4,
+    "faithful_5": 4
+   },
+   "ttso_pinned_masked": {
+    "valid": 12,
+    "correct": 5,
+    "correct_5": 4,
+    "faithful": 5,
+    "faithful_5": 4
+   }
+  },
+  "sanity_mismatches": [],
+  "coincidences": [
+   {
+    "i": 11,
+    "arm": "ttso_pinned_masked",
+    "vectors_passed": 3,
+    "task": "Add a U32 boxes and a Nat refund into a U32 sum, then take the smaller of that sum and a U32 hours. Call with boxes 12, refund 25 and hours 24.",
+    "text": "{\"inputs\": [{\"id\": \"boxes\", \"type\": \"U32\"}, {\"id\": \"refund\", \"type\": \"Nat\"}, {\"id\": \"hours\", \"type\": \"U32\"}], \"nodes\": [{\"id\": \"total\", \"op\": \"add\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"boxes\"}, {\"convert\": \"to_u32(refund)\"}, {\"lit\": \"2\"}]}, {\"id\": \"result\", \"op\": \"min\", \"out_type\": \"U32\", \"args\": [{\"ref\": \"total\"}, {\"ref\": \"hours\"}]}], \"output\": \"result\", \"call\": {\"boxes\": \"12\", \"refund\": \"25n\", \"hours\": \"24\"}}\n\n"
+   }
+  ],
+  "family_faithful_1": {
+   "H1": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned",
+     "greedy"
+    ],
+    "p_holm": 1.0
+   },
+   "H2": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 1.0
+   },
+   "H3": {
+    "only_first": 1,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned_masked",
+     "greedy_masked"
+    ],
+    "p_holm": 1.0
+   },
+   "H4": {
+    "only_first": 1,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned_masked",
+     "best_of_n_masked"
+    ],
+    "p_holm": 1.0
+   }
+  },
+  "family_faithful_5": {
+   "H1": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned",
+     "greedy"
+    ],
+    "p_holm": 1.0
+   },
+   "H2": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 1.0
+   },
+   "H3": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned_masked",
+     "greedy_masked"
+    ],
+    "p_holm": 1.0
+   },
+   "H4": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "ttso_pinned_masked",
+     "best_of_n_masked"
+    ],
+    "p_holm": 1.0
+   }
+  },
+  "best_of_n": {
+   "best_of_n": {
+    "tasks": 20,
+    "tasks_sampled": 16,
+    "samples_total": 34,
+    "samples_per_sampled_task": {
+     "2": 14,
+     "3": 2
+    },
+    "budget_min": 157,
+    "budget_max": 352,
+    "budget_below_max_new": 14,
+    "tasks_with_no_complete_sample": 0,
+    "no_complete_sample_tasks": []
+   },
+   "best_of_n_masked": {
+    "tasks": 20,
+    "tasks_sampled": 15,
+    "samples_total": 24,
+    "samples_per_sampled_task": {
+     "2": 9,
+     "1": 6
+    },
+    "budget_min": 45,
+    "budget_max": 293,
+    "budget_below_max_new": 15,
+    "tasks_with_no_complete_sample": 6,
+    "no_complete_sample_tasks": [
+     3,
+     4,
+     8,
+     12,
+     15,
+     16
+    ]
+   }
+  }
+ },
+ {
+  "run": "v0.3 json",
+  "path": "runs/v0.3/json",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "suite": "json",
+  "n": 60,
+  "counts": {
+   "greedy": {
+    "valid": 16,
+    "correct": 10,
+    "correct_5": 8,
+    "faithful": 8,
+    "faithful_5": 8
+   },
+   "greedy_masked": {
+    "valid": 20,
+    "correct": 11,
+    "correct_5": 9,
+    "faithful": 9,
+    "faithful_5": 9
+   },
+   "best_of_n": {
+    "valid": 18,
+    "correct": 10,
+    "correct_5": 8,
+    "faithful": 8,
+    "faithful_5": 8
+   },
+   "best_of_n_masked": {
+    "valid": 23,
+    "correct": 11,
+    "correct_5": 9,
+    "faithful": 9,
+    "faithful_5": 9
+   },
+   "ttso_pinned": {
+    "valid": 31,
+    "correct": 19,
+    "correct_5": 15,
+    "faithful": 14,
+    "faithful_5": 14
+   },
+   "ttso_pinned_masked": {
+    "valid": 32,
+    "correct": 22,
+    "correct_5": 18,
+    "faithful": 15,
+    "faithful_5": 15
+   },
+   "ttso_unpinned": {
+    "valid": 46,
+    "correct": 17,
+    "correct_5": 14,
+    "faithful": 11,
+    "faithful_5": 11
+   }
+  },
+  "sanity_mismatches": [],
+  "coincidences": [],
+  "family_faithful_1": {
+   "H1": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned",
+     "greedy"
+    ],
+    "p_holm": 0.125
+   },
+   "H2": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 0.125
+   },
+   "H3": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned_masked",
+     "greedy_masked"
+    ],
+    "p_holm": 0.125
+   },
+   "H4": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned_masked",
+     "best_of_n_masked"
+    ],
+    "p_holm": 0.125
+   }
+  },
+  "family_faithful_5": {
+   "H1": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned",
+     "greedy"
+    ],
+    "p_holm": 0.125
+   },
+   "H2": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 0.125
+   },
+   "H3": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned_masked",
+     "greedy_masked"
+    ],
+    "p_holm": 0.125
+   },
+   "H4": {
+    "only_first": 6,
+    "only_second": 0,
+    "p": 0.03125,
+    "pair": [
+     "ttso_pinned_masked",
+     "best_of_n_masked"
+    ],
+    "p_holm": 0.125
+   }
+  },
+  "best_of_n": {
+   "best_of_n": {
+    "tasks": 60,
+    "tasks_sampled": 44,
+    "samples_total": 78,
+    "samples_per_sampled_task": {
+     "1": 15,
+     "2": 24,
+     "3": 5
+    },
+    "budget_min": 17,
+    "budget_max": 306,
+    "budget_below_max_new": 44,
+    "tasks_with_no_complete_sample": 14,
+    "no_complete_sample_tasks": [
+     0,
+     12,
+     16,
+     20,
+     26,
+     31,
+     32,
+     34,
+     38,
+     44,
+     48,
+     52,
+     56,
+     59
+    ]
+   },
+   "best_of_n_masked": {
+    "tasks": 60,
+    "tasks_sampled": 40,
+    "samples_total": 70,
+    "samples_per_sampled_task": {
+     "1": 14,
+     "2": 22,
+     "3": 4
+    },
+    "budget_min": 8,
+    "budget_max": 300,
+    "budget_below_max_new": 40,
+    "tasks_with_no_complete_sample": 12,
+    "no_complete_sample_tasks": [
+     0,
+     12,
+     16,
+     20,
+     31,
+     32,
+     35,
+     44,
+     48,
+     52,
+     56,
+     59
+    ]
+   }
+  }
+ },
+ {
+  "run": "v0.3 catalog",
+  "path": "runs/v0.3/catalog",
+  "model": "Qwen/Qwen3.5-0.8B",
+  "suite": "catalog",
+  "n": 50,
+  "counts": {
+   "greedy": {
+    "valid": 0,
+    "correct": 0,
+    "correct_5": 0,
+    "faithful": 0,
+    "faithful_5": 0
+   },
+   "best_of_n": {
+    "valid": 1,
+    "correct": 0,
+    "correct_5": 0,
+    "faithful": 0,
+    "faithful_5": 0
+   },
+   "local": {
+    "valid": 28,
+    "correct": 19,
+    "correct_5": 19,
+    "faithful": 18,
+    "faithful_5": 18
+   },
+   "upstream": {
+    "valid": 28,
+    "correct": 22,
+    "correct_5": 22,
+    "faithful": 0,
+    "faithful_5": 0
+   },
+   "smart": {
+    "valid": 29,
+    "correct": 23,
+    "correct_5": 23,
+    "faithful": 0,
+    "faithful_5": 0
+   },
+   "smart_pinned": {
+    "valid": 28,
+    "correct": 19,
+    "correct_5": 19,
+    "faithful": 18,
+    "faithful_5": 18
+   }
+  },
+  "sanity_mismatches": [],
+  "coincidences": [],
+  "family_correct_1": {
+   "C1": {
+    "only_first": 23,
+    "only_second": 0,
+    "p": 2.384185791015625e-07,
+    "pair": [
+     "smart",
+     "best_of_n"
+    ],
+    "p_holm": 9.5367431640625e-07
+   },
+   "C2": {
+    "only_first": 19,
+    "only_second": 0,
+    "p": 3.814697265625e-06,
+    "pair": [
+     "smart_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 7.62939453125e-06
+   },
+   "C3": {
+    "only_first": 19,
+    "only_second": 0,
+    "p": 3.814697265625e-06,
+    "pair": [
+     "local",
+     "best_of_n"
+    ],
+    "p_holm": 7.62939453125e-06
+   },
+   "C4": {
+    "only_first": 22,
+    "only_second": 0,
+    "p": 4.76837158203125e-07,
+    "pair": [
+     "upstream",
+     "best_of_n"
+    ],
+    "p_holm": 1.430511474609375e-06
+   }
+  },
+  "family_faithful_5": {
+   "C1": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "smart",
+     "best_of_n"
+    ],
+    "p_holm": 1.0
+   },
+   "C2": {
+    "only_first": 18,
+    "only_second": 0,
+    "p": 7.62939453125e-06,
+    "pair": [
+     "smart_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 3.0517578125e-05
+   },
+   "C3": {
+    "only_first": 18,
+    "only_second": 0,
+    "p": 7.62939453125e-06,
+    "pair": [
+     "local",
+     "best_of_n"
+    ],
+    "p_holm": 3.0517578125e-05
+   },
+   "C4": {
+    "only_first": 0,
+    "only_second": 0,
+    "p": 1.0,
+    "pair": [
+     "upstream",
+     "best_of_n"
+    ],
+    "p_holm": 1.0
+   }
+  },
+  "family_correct_5": {
+   "C1": {
+    "only_first": 23,
+    "only_second": 0,
+    "p": 2.384185791015625e-07,
+    "pair": [
+     "smart",
+     "best_of_n"
+    ],
+    "p_holm": 9.5367431640625e-07
+   },
+   "C2": {
+    "only_first": 19,
+    "only_second": 0,
+    "p": 3.814697265625e-06,
+    "pair": [
+     "smart_pinned",
+     "best_of_n"
+    ],
+    "p_holm": 7.62939453125e-06
+   },
+   "C3": {
+    "only_first": 19,
+    "only_second": 0,
+    "p": 3.814697265625e-06,
+    "pair": [
+     "local",
+     "best_of_n"
+    ],
+    "p_holm": 7.62939453125e-06
+   },
+   "C4": {
+    "only_first": 22,
+    "only_second": 0,
+    "p": 4.76837158203125e-07,
+    "pair": [
+     "upstream",
+     "best_of_n"
+    ],
+    "p_holm": 1.430511474609375e-06
+   }
+  },
+  "smart_pinned_vs_smart_faithful_5": {
+   "only_first": 18,
+   "only_second": 0,
+   "p": 7.62939453125e-06
+  },
+  "best_of_n": {
+   "best_of_n": {
+    "tasks": 50,
+    "tasks_sampled": 50,
+    "samples_total": 100,
+    "samples_per_sampled_task": {
+     "1": 19,
+     "3": 14,
+     "2": 15,
+     "4": 1,
+     "5": 1
+    },
+    "budget_min": 40,
+    "budget_max": 300,
+    "budget_below_max_new": 48,
+    "tasks_with_no_complete_sample": 18,
+    "no_complete_sample_tasks": [
+     0,
+     1,
+     3,
+     4,
+     10,
+     11,
+     16,
+     17,
+     18,
+     21,
+     22,
+     23,
+     24,
+     28,
+     37,
+     39,
+     41,
+     42
+    ]
+   }
+  }
+ }
+]

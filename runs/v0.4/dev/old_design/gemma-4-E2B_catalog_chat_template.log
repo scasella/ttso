@@ -1,0 +1,305 @@
+W1104 07:40:25.092000 28547 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/540 [00:00<?, ?it/s]Loading weights: 100%|██████████| 540/540 [00:00<00:00, 7909.75it/s]
+[transformers] [1mGemma4ForCausalLM LOAD REPORT[0m from: google/gemma-4-E2B
+Key                                                                          | Status     |  | 
+-----------------------------------------------------------------------------+------------+--+-
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.depthwise_conv1d.weight            | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.input_max           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.norm_post_attn.weight                      | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.per_dim_scale                    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.output_max          | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.input_max             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.input_min                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.input_max             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.linear.weight    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.linear.weight    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.linear.weight       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.post_layer_norm.weight       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.pre_layer_norm.weight              | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.input_min             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.input_min        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.output_max                | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.output_min            | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.post_feedforward_layernorm.weight | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.output_max            | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.input_layernorm.weight            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.linear.weight               | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.input_min           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.post_layer_norm.weight       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.output_min          | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.linear.weight    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.input_max        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.input_min        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.linear.weight       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.output_max       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.input_max        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.linear.weight         | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.input_min                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.output_max                | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.output_max                  | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.input_min             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.input_max           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.output_min              | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.input_min        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.output_min            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.linear.weight             | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.linear.weight         | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.input_max               | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.post_attention_layernorm.weight   | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_norm.weight           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.pre_layer_norm.weight        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.input_max        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.norm_pre_attn.weight                       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.output_max                | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.output_min          | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.input_max                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.conv_norm.weight                   | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.linear.weight             | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.relative_k_proj.weight           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.input_min                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.output_min                  | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.input_min           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.output_min                | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.output_min                | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.input_min               | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.output_max          | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.linear.weight    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_norm.weight           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.linear.weight           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.pre_layer_norm.weight        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.linear.weight             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.pre_feedforward_layernorm.weight  | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.input_max                   | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.output_min                | UNEXPECTED |  | 
+model.vision_tower.patch_embedder.position_embedding_table                   | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.input_max                 | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.output_max       | UNEXPECTED |  | 
+model.audio_tower.output_proj.weight                                         | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.output_max            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.input_min                   | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.norm_out.weight                            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.input_max                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.output_max              | UNEXPECTED |  | 
+model.audio_tower.output_proj.bias                                           | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.input_proj_linear.weight         | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer0.norm.weight               | UNEXPECTED |  | 
+model.vision_tower.patch_embedder.input_proj.weight                          | UNEXPECTED |  | 
+model.embed_audio.embedding_projection.weight                                | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer1.conv.weight               | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer0.conv.weight               | UNEXPECTED |  | 
+model.embed_vision.embedding_projection.weight                               | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer1.norm.weight               | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+[ 0] greedy x | local x r=3 +658 | upstream x r=3 +658 | smart x r=3 +658 | smart_pinned x r=3 +658 | best_of_n x | best_of_2_full x
+[ 1] greedy x | local x r=3 +658 | upstream x r=3 +658 | smart x r=3 +658 | smart_pinned x r=3 +658 | best_of_n x | best_of_2_full x
+[ 2] greedy x | local x r=3 +506 | upstream x r=3 +506 | smart x r=3 +506 | smart_pinned x r=3 +506 | best_of_n x | best_of_2_full x
+[ 3] greedy x | local x r=3 +495 | upstream x r=3 +495 | smart x r=3 +495 | smart_pinned x r=3 +495 | best_of_n x | best_of_2_full x
+[ 4] greedy x | local x r=3 +669 | upstream x r=3 +669 | smart x r=3 +669 | smart_pinned x r=3 +669 | best_of_n x | best_of_2_full x
+[ 5] greedy x | local x r=3 +500 | upstream x r=3 +500 | smart x r=3 +500 | smart_pinned x r=3 +500 | best_of_n x | best_of_2_full x
+[ 6] greedy x | local x r=3 +648 | upstream x r=3 +648 | smart x r=3 +648 | smart_pinned x r=3 +648 | best_of_n x | best_of_2_full x
+[ 7] greedy x | local x r=3 +648 | upstream x r=3 +648 | smart x r=3 +648 | smart_pinned x r=3 +648 | best_of_n x | best_of_2_full x
+[ 8] greedy x | local x r=3 +658 | upstream x r=3 +658 | smart x r=3 +658 | smart_pinned x r=3 +658 | best_of_n x | best_of_2_full x
+[ 9] greedy x | local x r=3 +685 | upstream x r=3 +685 | smart x r=3 +685 | smart_pinned x r=3 +685 | best_of_n x | best_of_2_full x
+[10] greedy x | local x r=3 +657 | upstream x r=3 +657 | smart x r=3 +657 | smart_pinned x r=3 +657 | best_of_n x | best_of_2_full x
+[11] greedy x | local x r=3 +681 | upstream x r=3 +681 | smart x r=3 +681 | smart_pinned x r=3 +681 | best_of_n x | best_of_2_full x
+[12] greedy x | local x r=3 +560 | upstream x r=3 +560 | smart x r=3 +560 | smart_pinned x r=3 +560 | best_of_n x | best_of_2_full x
+[13] greedy x | local x r=3 +658 | upstream x r=3 +658 | smart x r=3 +658 | smart_pinned x r=3 +658 | best_of_n x | best_of_2_full x
+[14] greedy x | local x r=3 +660 | upstream x r=3 +660 | smart x r=3 +660 | smart_pinned x r=3 +660 | best_of_n x | best_of_2_full x
+[15] greedy x | local x r=3 +658 | upstream x r=3 +658 | smart x r=3 +658 | smart_pinned x r=3 +658 | best_of_n x | best_of_2_full x
+[16] greedy x | local x r=3 +519 | upstream x r=3 +519 | smart x r=3 +519 | smart_pinned x r=3 +519 | best_of_n x | best_of_2_full x
+[17] greedy x | local x r=3 +658 | upstream x r=3 +658 | smart x r=3 +658 | smart_pinned x r=3 +658 | best_of_n x | best_of_2_full x
+[18] greedy x | local x r=3 +661 | upstream x r=3 +661 | smart x r=3 +661 | smart_pinned x r=3 +661 | best_of_n x | best_of_2_full x
+[19] greedy x | local x r=3 +521 | upstream x r=3 +521 | smart x r=3 +521 | smart_pinned x r=3 +521 | best_of_n x | best_of_2_full x
+{
+ "greedy": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ },
+ "best_of_n": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ },
+ "best_of_2_full": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ },
+ "local": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ },
+ "upstream": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ },
+ "smart": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ },
+ "smart_pinned": {
+  "valid": 0,
+  "correct": 0,
+  "correct_5": 0,
+  "faithful": 0,
+  "faithful_5": 0
+ }
+}
+{
+ "C1": {
+  "only_first": 0,
+  "only_second": 0,
+  "p": 1.0,
+  "pair": [
+   "smart",
+   "best_of_n"
+  ],
+  "p_holm": 1.0
+ },
+ "C2": {
+  "only_first": 0,
+  "only_second": 0,
+  "p": 1.0,
+  "pair": [
+   "smart_pinned",
+   "best_of_n"
+  ],
+  "p_holm": 1.0
+ },
+ "C3": {
+  "only_first": 0,
+  "only_second": 0,
+  "p": 1.0,
+  "pair": [
+   "local",
+   "best_of_n"
+  ],
+  "p_holm": 1.0
+ },
+ "C4": {
+  "only_first": 0,
+  "only_second": 0,
+  "p": 1.0,
+  "pair": [
+   "upstream",
+   "best_of_n"
+  ],
+  "p_holm": 1.0
+ }
+}
+{
+ "C5": {
+  "only_first": 0,
+  "only_second": 0,
+  "p": 1.0,
+  "pair": [
+   "smart_pinned",
+   "smart"
+  ],
+  "outcome": "faithful_5"
+ }
+}
+{
+ "shadow": {
+  "local": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.12401458419238527,
+   "symbolic_ms": 0.01143606835588192,
+   "main": "deltanet"
+  },
+  "upstream": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.0658889184705913,
+   "symbolic_ms": 0.009346549146963904,
+   "main": "deltanet"
+  },
+  "smart": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.06197982972177366,
+   "symbolic_ms": 0.009277116138643274,
+   "main": "deltanet"
+  },
+  "smart_pinned": {
+   "rounds": 60,
+   "same_diagnosis": 60,
+   "same_edit": 60,
+   "deltanet_ms": 0.05894024895193676,
+   "symbolic_ms": 0.008695866078293571,
+   "main": "deltanet"
+  }
+ },
+ "samples": {
+  "best_of_n": {
+   "tasks_sampled": 20,
+   "total": 63,
+   "complete": 10,
+   "truncated": 20,
+   "capped": 33,
+   "complete_per_sampled_task": 0.5,
+   "truncated_per_sampled_task": 1.0,
+   "tasks_with_no_complete_sample": 13
+  },
+  "best_of_2_full": {
+   "tasks_sampled": 20,
+   "total": 40,
+   "complete": 6,
+   "truncated": 0,
+   "capped": 34,
+   "complete_per_sampled_task": 0.3,
+   "truncated_per_sampled_task": 0.0,
+   "tasks_with_no_complete_sample": 15
+  }
+ }
+}

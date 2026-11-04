@@ -1,7 +1,7 @@
 """The v0.3 BendLite catalog suite and BendLite's pin_inputs (CPU).
 
 The held-out task texts are frozen by hash (runs/v0.3/PREREGISTRATION.md), as are the JSON DAG
-held-out tasks; the reference programs are faithful; the outcome definitions separate a retyped
+held-out tasks; the reference programs are faithful on all 5 input vectors; the outcome definitions separate a retyped
 program (correct, not faithful) and a literal in the def (valid, not correct); pinning freezes the
 parameter declarations and routes a failed group operand to a local rewrite.
 """
@@ -32,19 +32,29 @@ def test_frozen_suites():
     for t in dev + held:
         assert 2 <= len(t["items"]) <= 4 and "Nat" in t["types"] and "U32" in t["types"]
         o = cs.CatalogSuite().outcome(t, reference_check(t["reference"]), t["reference"])
-        assert o == {"valid": True, "correct": True, "faithful": True, "error": ""}, t
+        assert o == {"valid": True, "correct": True, "faithful": True, "correct_5": True, "faithful_5": True, "vectors_passed": 5, "error": ""}, t
 
 
 def test_outcomes_retyped_and_literal():
-    t = {"items": ["stock", "level"], "types": ["Nat", "U32"], "values": [6, 38], "expected": 44}
+    t = {"text": "Catalog: stock = 6 (Nat count), level = 38 (U32 value). Task: return stock + level.",
+         "items": ["stock", "level"], "types": ["Nat", "U32"], "values": [6, 38], "expected": 44,
+         "terms": ["stock", "level"]}
     out = lambda p: cs.CatalogSuite().outcome(t, reference_check(p), p)
     head = "import Base\n\ndef quote({}) -> U32:\n  ({} : U32)\n\ndef main() -> U32:\n  quote({})\n"
     faithful = head.format("stock: Nat, level: U32", "U32.from_nat(stock) + level", "6n, 38")
     retyped = head.format("stock: U32, level: U32", "stock + level", "6, 38")
     literal = head.format("stock: U32, level: U32", "stock + 38", "6, 38")
-    assert out(faithful) == {"valid": True, "correct": True, "faithful": True, "error": ""}
-    assert out(retyped)["correct"] and not out(retyped)["faithful"]
+    assert out(faithful) == {"valid": True, "correct": True, "faithful": True, "correct_5": True, "faithful_5": True, "vectors_passed": 5, "error": ""}
+    assert out(retyped)["correct_5"] and not out(retyped)["faithful"] and not out(retyped)["faithful_5"]
     assert out(literal)["valid"] and not out(literal)["correct"]
+    # right on the stated catalog only: the task counts level twice, the program counts stock twice,
+    # and stock = level = 6 there
+    t2 = {"text": "Catalog: stock = 6 (Nat count), level = 6 (U32 value). Task: return stock + level + level.",
+          "items": ["stock", "level"], "types": ["Nat", "U32"], "values": [6, 6], "expected": 18,
+          "terms": ["stock", "level", "level"]}
+    lucky = head.format("+stock: Nat, level: U32", "U32.from_nat(stock) + U32.from_nat(stock) + level", "6n, 6")
+    o2 = cs.CatalogSuite().outcome(t2, reference_check(lucky), lucky)
+    assert o2["faithful"] and not o2["correct_5"] and o2["vectors_passed"] == 1
 
 
 def test_bendlite_pinned_lexing(qwen_tokenizer, qwen_texts):
