@@ -1,0 +1,144 @@
+{
+ "n": 60,
+ "arms": [
+  "greedy_masked",
+  "greedy_typemasked",
+  "best_of_n_typemasked",
+  "ttso_pinned_masked",
+  "ttso_pinned_typemasked"
+ ],
+ "greedy_masked": {
+  "valid": 30,
+  "correct": 17,
+  "faithful": 17,
+  "correct_5": 17,
+  "faithful_5": 17,
+  "faithful_wilson95": [
+   0.1851,
+   0.4077
+  ],
+  "faithful_5_wilson95": [
+   0.1851,
+   0.4077
+  ],
+  "latency_mean_s": 5.417883333333333
+ },
+ "greedy_typemasked": {
+  "valid": 57,
+  "correct": 26,
+  "faithful": 26,
+  "correct_5": 17,
+  "faithful_5": 17,
+  "faithful_wilson95": [
+   0.3157,
+   0.559
+  ],
+  "faithful_5_wilson95": [
+   0.1851,
+   0.4077
+  ],
+  "latency_mean_s": 5.977483333333334
+ },
+ "best_of_n_typemasked": {
+  "valid": 57,
+  "correct": 26,
+  "faithful": 26,
+  "correct_5": 17,
+  "faithful_5": 17,
+  "faithful_wilson95": [
+   0.3157,
+   0.559
+  ],
+  "faithful_5_wilson95": [
+   0.1851,
+   0.4077
+  ],
+  "tokens_total": 9,
+  "samples": {
+   "tasks_sampled": 3,
+   "total": 3,
+   "complete": 0,
+   "truncated": 3,
+   "capped": 0,
+   "complete_per_sampled_task": 0.0,
+   "truncated_per_sampled_task": 1.0,
+   "tasks_with_no_complete_sample": 3
+  }
+ },
+ "ttso_pinned_masked": {
+  "valid": 46,
+  "correct": 33,
+  "faithful": 33,
+  "correct_5": 33,
+  "faithful_5": 33,
+  "faithful_wilson95": [
+   0.4249,
+   0.6691
+  ],
+  "faithful_5_wilson95": [
+   0.4249,
+   0.6691
+  ],
+  "extra_tokens_total": 4877,
+  "latency_mean_s": 8.4609,
+  "latency_max_s": 17.411,
+  "same_greedy": true,
+  "rewinds": 75,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 75,
+   "same_diagnosis": 75,
+   "same_edit": 75,
+   "deltanet_ms": 4.530643394682556,
+   "symbolic_ms": 0.02628601078564922,
+   "main": "deltanet"
+  }
+ },
+ "ttso_pinned_typemasked": {
+  "valid": 57,
+  "correct": 26,
+  "faithful": 26,
+  "correct_5": 17,
+  "faithful_5": 17,
+  "faithful_wilson95": [
+   0.3157,
+   0.559
+  ],
+  "faithful_5_wilson95": [
+   0.1851,
+   0.4077
+  ],
+  "extra_tokens_total": 9,
+  "latency_mean_s": 5.986466666666667,
+  "latency_max_s": 13.248,
+  "same_greedy": true,
+  "rewinds": 9,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 9,
+   "same_diagnosis": 9,
+   "same_edit": 9,
+   "deltanet_ms": 0.13046766010423502,
+   "symbolic_ms": 0.01136568607762456,
+   "main": "deltanet"
+  }
+ },
+ "peak_mps_allocated_gb": 4.626139648,
+ "peak_rss_gb": 2.878439424,
+ "model": "google/gemma-4-E2B",
+ "revision": "433813a669639fd7eaa83155828e9000ed357d53",
+ "dtype": "bfloat16",
+ "split": "heldout",
+ "n_tasks": 60,
+ "wall_s": 868.9,
+ "max_new_tokens": 320,
+ "k_max": 3,
+ "temperature": 0.7,
+ "device_weights_gib": 4.246382236480713,
+ "mapped_gib": 4.375,
+ "prompt": "raw",
+ "torch": "2.15.0",
+ "mps": true
+}

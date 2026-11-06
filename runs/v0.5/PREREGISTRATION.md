@@ -293,4 +293,18 @@ Over all 44 audited checks: 59 `out_type`, 38 `output`, 8 `input_type`.
 
 ## Post-run record (added after the held-out run)
 
-- **Pre-registration commit (public ttso):** _filled in after the push._
+- **Pre-registration commit:**
+  - public ttso: `ac8a2f9` (`ac8a2f96395fc111485c8fc9c8c3e3116f01bde4`), a fast-forward from
+    v0.4's `12d39f2`; diffspec `a2229c3`.
+  - Committed at 12:45:01 UTC on 6 November 2026 and pushed by 12:45:21. The `ls-remote` that
+    confirmed it ran at that time.
+- **Held-out run:** `scripts/benchmark_v05.py heldout`, from 12:45:25 to 13:00:05 UTC (868.9 s of
+  benchmark wall time), exit 0. Results are in `runs/v0.5/gemma-4-E2B/json/` and the log in
+  `runs/v0.5/gemma-4-E2B_json.log`. No task was run before the push.
+- **Pauses and sleeps:** during the run the memory guard made no pause; it logged only 7 LOW
+  notices (pressure 2, 28–32% free). `pmset -g log` shows no sleep in the run window. So `scripts/pauses_v05.py` left
+  out 0 tasks (`latency.json`), and nothing was excluded.
+- **R:** reproduced exactly, so there is no difference to explain. `greedy_masked` is 17 and
+  `ttso_pinned_masked` 33, and both texts are identical to v0.4's on all 60 tasks.
+- **Code:** no code changed between the freeze and the run.
+- **Results:** in `runs/v0.5/PROGRESS_REPORT.md`.
