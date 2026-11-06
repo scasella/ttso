@@ -1,0 +1,303 @@
+W1106 07:24:20.214000 4721 .venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/redirects.py:35] NOTE: Redirects are currently not supported in MacOs.
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:   0%|          | 1/311 [00:00<02:42,  1.91it/s]Loading weights:  68%|██████▊   | 213/311 [00:00<00:00, 453.39it/s]Loading weights: 100%|██████████| 311/311 [00:00<00:00, 401.30it/s]
+
+[backend] HuggingFaceMPSBackend: rewind replay exact; edited vs fresh decode agree 100%
+.Loading weights:   0%|          | 0/320 [00:00<?, ?it/s]Loading weights:   0%|          | 1/320 [00:00<04:07,  1.29it/s]Loading weights: 100%|██████████| 320/320 [00:00<00:00, 410.99it/s]
+[transformers] `causal_conv1d_fn` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `chunk_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+[transformers] `causal_conv1d_update` is falling back to its reference PyTorch implementation because `causal_conv1d` is not installed. This is correct but much slower; install `causal_conv1d` for the optimized kernel.
+[transformers] `fused_recurrent_gated_delta_rule` is falling back to its reference PyTorch implementation because `flash-linear-attention` is not installed. This is correct but much slower; install `flash-linear-attention` for the optimized kernel.
+
+[backend] HuggingFaceMPSBackend: rewind replay exact; edited vs fresh decode agree 100%
+[backend] Qwen/Qwen3.5-0.8B: checkpoints held at most 38 MiB
+.
+[backend] HuggingFaceMPSBackend: rewind replay exact; edited vs fresh decode agree 100%
+[backend] Qwen/Qwen3.5-0.8B: checkpoints held at most 75 MiB
+.
+[backend] LlamaCppBackend: rewind replay exact; edited vs fresh decode agree 100%
+........Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights:   0%|          | 1/310 [00:00<02:29,  2.07it/s]Loading weights:  86%|████████▌ | 267/310 [00:00<00:00, 604.48it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 478.15it/s]
+
+[contract] task 0: round 1 'U' -> 'Nat'; after 3 rounds valid=True faithful=False
+
+[contract] task 4: round 1 'U' -> 'Nat'; after 3 rounds valid=True faithful=False
+
+[contract] task 8: round 1 'U' -> 'Nat'; after 3 rounds valid=False faithful=False
+
+[contract] task 12: round 1 'U' -> 'Nat'; after 3 rounds valid=True faithful=True
+
+[contract] task 16: round 1 'U' -> 'Nat'; after 2 rounds valid=True faithful=True
+....
+[gate1] cpu torch.float32: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (0.1s)
+.
+[gate1] cpu torch.float16: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (0.2s)
+.
+[gate1] mps torch.float32: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (1.1s)
+.
+[gate1] mps torch.float16: 200 programs, 27857 tokens, 3906 checks (2787 failing): 100% token-for-token agreement (1.1s)
+.
+[gate1] cpu torch.float32: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] cpu torch.float16: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] mps torch.float32: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] mps torch.float16: |grad| at t_decl, d=8: 2.370091e-04, d=256: 2.370091e-04, ratio 1.000000
+.
+[gate1] straight-through bridge == spec formula on 20 failing programs
+.
+[gate2] K=5: gradient-directed single edit fixed 200/200 targeted declarations (Blind next-best type token: 45/200)
+..
+[gate3] Smart, spec account: valid=True rounds=2 extra=66
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case B decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=55 (call arg), flagged [8, 55], uses=1 -> case A call t*=55 'n'->',' valid_after=True
+.
+[gate3] Smart, recorded trajectory: valid=True rounds=2 extra=62
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case B decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=59 (call arg), flagged [15, 59], uses=1 -> case A call t*=59 'n'->',' valid_after=True
+
+[gate3] Upstream (v1), recorded trajectory: valid=False rounds=3 extra=106
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case A decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=59 (call arg), flagged [15, 59], uses=1 -> case A decl t*=15 ' U'->' Nat' valid_after=False
+   round 3: first failure t=35 (group operand), flagged [15], uses=0 -> case C local t*=35 ' level'->'!' valid_after=False
+.
+[gate3] Upstream (v1), spec account: valid=True rounds=2 extra=66
+   round 1: first failure t=31 (group operand), flagged [8], uses=0 -> case A decl t*=8 ' Nat'->' U' valid_after=False
+   round 2: first failure t=55 (call arg), flagged [8, 55], uses=1 -> case A flagged t*=55 'n'->',' valid_after=True
+.Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 3703.40it/s]
+[ 0] greedy x | greedy_masked x | ttso_pinned v r=2 +87 | ttso_pinned_masked v r=2 +87 | ttso_unpinned x r=3 +309 | best_of_n x | best_of_n_masked x
+[ 1] greedy x | greedy_masked v | ttso_pinned x r=3 +273 | ttso_pinned_masked v r=0 +0 | ttso_unpinned x r=3 +273 | best_of_n x | best_of_n_masked v
+[ 2] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +134 | ttso_pinned_masked f r=3 +119 | ttso_unpinned C r=3 +176 | best_of_n x | best_of_n_masked x
+[ 4] greedy x | greedy_masked x | ttso_pinned v r=2 +22 | ttso_pinned_masked F r=1 +9 | ttso_unpinned v r=2 +22 | best_of_n x | best_of_n_masked x
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +242 | ttso_pinned_masked x r=3 +242 | ttso_unpinned x r=3 +280 | best_of_n x | best_of_n_masked x
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[ 7] greedy x | greedy_masked x | ttso_pinned f r=3 +176 | ttso_pinned_masked f r=3 +172 | ttso_unpinned C r=3 +175 | best_of_n x | best_of_n_masked x
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +559 | ttso_pinned_masked v r=2 +113 | ttso_unpinned v r=3 +221 | best_of_n x | best_of_n_masked x
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +209 | ttso_pinned_masked x r=3 +209 | ttso_unpinned x r=3 +287 | best_of_n x | best_of_n_masked x
+[10] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +236 | ttso_pinned_masked x r=3 +238 | ttso_unpinned C r=3 +264 | best_of_n x | best_of_n_masked x
+[12] greedy x | greedy_masked x | ttso_pinned F r=2 +87 | ttso_pinned_masked F r=2 +87 | ttso_unpinned C r=1 +107 | best_of_n x | best_of_n_masked x
+[13] greedy x | greedy_masked v | ttso_pinned v r=1 +10 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=1 +10 | best_of_n x | best_of_n_masked v
+[14] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[15] greedy x | greedy_masked x | ttso_pinned f r=3 +116 | ttso_pinned_masked f r=3 +116 | ttso_unpinned x r=3 +275 | best_of_n x | best_of_n_masked x
+[16] greedy x | greedy_masked x | ttso_pinned C r=1 +48 | ttso_pinned_masked C r=1 +48 | ttso_unpinned C r=2 +231 | best_of_n x | best_of_n_masked x
+[17] greedy x | greedy_masked v | ttso_pinned v r=2 +11 | ttso_pinned_masked v r=0 +0 | ttso_unpinned v r=2 +11 | best_of_n x | best_of_n_masked v
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0 | ttso_unpinned F r=0 +0 | best_of_n F | best_of_n_masked F
+[19] greedy x | greedy_masked x | ttso_pinned f r=3 +142 | ttso_pinned_masked f r=3 +123 | ttso_unpinned C r=3 +183 | best_of_n x | best_of_n_masked x
+
+[gate4] Qwen/Qwen3-0.6B-Base on mps/fp16, 20 prompts -> <repo>/runs/gate4/20261106-072956
+                       valid correct faithful  faithful 95% CI extra tok mean s
+  greedy                   5       5        5        0.11-0.47         0   2.23
+  greedy_masked            8       5        5        0.11-0.47         0   2.20
+  best_of_n                5       5        5        0.11-0.47      2352 
+  best_of_n_masked         8       5        5        0.11-0.47      1563 
+  ttso_pinned             14      10        9        0.26-0.66      2352   3.91
+  ttso_pinned_masked      17      12       11        0.34-0.74      1563   3.31
+  ttso_unpinned           15      11        5        0.11-0.47      2824   4.25
+  peak MPS allocated 1.42 GB
+.[ 0] greedy x | greedy_masked x | ttso_pinned v r=2 +87 | ttso_pinned_masked v r=2 +87
+[ 1] greedy x | greedy_masked v | ttso_pinned x r=3 +273 | ttso_pinned_masked v r=0 +0
+[ 2] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[ 3] greedy x | greedy_masked x | ttso_pinned x r=3 +134 | ttso_pinned_masked f r=3 +119
+[ 4] greedy x | greedy_masked x | ttso_pinned v r=3 +105 | ttso_pinned_masked F r=2 +90
+[ 5] greedy x | greedy_masked x | ttso_pinned x r=3 +242 | ttso_pinned_masked x r=3 +242
+[ 6] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[ 7] greedy x | greedy_masked x | ttso_pinned f r=3 +176 | ttso_pinned_masked f r=3 +172
+[ 8] greedy x | greedy_masked x | ttso_pinned x r=3 +559 | ttso_pinned_masked v r=2 +113
+[ 9] greedy x | greedy_masked x | ttso_pinned x r=3 +209 | ttso_pinned_masked x r=3 +209
+[10] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[11] greedy x | greedy_masked x | ttso_pinned x r=3 +236 | ttso_pinned_masked x r=3 +238
+[12] greedy x | greedy_masked x | ttso_pinned F r=2 +87 | ttso_pinned_masked F r=2 +87
+[13] greedy x | greedy_masked v | ttso_pinned v r=1 +10 | ttso_pinned_masked v r=0 +0
+[14] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[15] greedy x | greedy_masked x | ttso_pinned f r=3 +116 | ttso_pinned_masked f r=3 +116
+[16] greedy x | greedy_masked x | ttso_pinned C r=1 +48 | ttso_pinned_masked C r=1 +48
+[17] greedy x | greedy_masked v | ttso_pinned v r=2 +11 | ttso_pinned_masked v r=0 +0
+[18] greedy F | greedy_masked F | ttso_pinned F r=0 +0 | ttso_pinned_masked F r=0 +0
+[19] greedy x | greedy_masked x | ttso_pinned f r=3 +142 | ttso_pinned_masked f r=3 +123
+
+[gate4] llama.cpp (qwen3-0.6b-base-f16.gguf) vs HuggingFace mps, 20 prompts
+                       valid correct faithful  faithful 95% CI extra tok mean s
+  greedy                   5       5        5        0.11-0.47         0   1.34
+  greedy_masked            8       5        5        0.11-0.47         0   1.33
+  ttso_pinned             14      10        9        0.26-0.66      2435   2.33
+  ttso_pinned_masked      17      12       11        0.34-0.74      1644   1.99
+  ttso_pinned: mean s/problem mps 3.91 vs llama.cpp 2.33
+  ttso_pinned_masked: mean s/problem mps 3.31 vs llama.cpp 1.99
+  memory: mps allocator peak 1.42 GB; llama.cpp Metal buffers 1.62 GB, CPU buffers 0.30 GB, host logits array 1.16 GB
+  per-problem mismatches (problem, regime): [(4, 'ttso_pinned'), (4, 'ttso_pinned_masked')]
+  problem 4 ttso_pinned: greedy diverges at token 85 ('ref' vs 'convert'), top-two margin mps 0.0156, llama.cpp 0.0211 -> float16 tie
+  problem 4 ttso_pinned_masked: greedy diverges at token 85 ('ref' vs 'convert'), top-two margin mps 0.0156, llama.cpp 0.0211 -> float16 tie
+.
+[incremental] 62743 prefixes of 150 documents (36 complete): SchemaState == SchemaPrefix
+.
+[incremental] 11093 accept() queries and the candidates() masks agree on 6 tokenized documents
+.
+[incremental] 20 seed-0 tasks, masked greedy / masked ttso repair / masked Best-of-N: 20/20 token-for-token identical (reparse vs incremental)
+                                       reparse incremental speedup
+  mask s/problem, greedy                 0.013       0.002    7.2x
+  mask s/problem, greedy + repair        0.036       0.005    7.6x
+  mask s/problem, Best-of-N              0.006       0.001    5.3x
+  latency s/problem, greedy               2.28        2.20   1.03x
+  latency s/problem, greedy + repair      3.44        3.31   1.04x
+  CPU replay over the 20 repaired completions (2939 tokens): accept() 40 vs 6 us/token (6.4x), candidates() 2.84 vs 0.09 ms/token (30.0x)
+.Loading weights:   0%|          | 0/540 [00:00<?, ?it/s]Loading weights: 100%|██████████| 540/540 [00:00<00:00, 9180.59it/s]
+[transformers] [1mGemma4ForCausalLM LOAD REPORT[0m from: google/gemma-4-E2B
+Key                                                                          | Status     |  | 
+-----------------------------------------------------------------------------+------------+--+-
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.output_max       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.conv_norm.weight                   | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.output_max                | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.input_max           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.input_min                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.output_max       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.output_max          | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.output_max            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.post_layer_norm.weight       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.per_dim_scale                    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.input_max             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.linear.weight    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.output_min                | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.pre_layer_norm.weight        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.input_max                 | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.linear.weight    | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.linear.weight         | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.linear.weight       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.output_max                | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.input_max                 | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.input_min        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.output_min          | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.post_layer_norm.weight       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.pre_layer_norm.weight        | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer0.norm.weight               | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.input_min           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.linear.weight             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.norm_pre_attn.weight                       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_norm.weight           | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.depthwise_conv1d.weight            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.pre_layer_norm.weight              | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.output_min            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.v_proj.output_min                | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.output_min       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.output_max                | UNEXPECTED |  | 
+model.audio_tower.output_proj.weight                                         | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.input_min           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.relative_k_proj.weight           | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_norm.weight           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.linear.weight           | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.post_feedforward_layernorm.weight | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.input_max        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.output_max       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.input_min        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.output_min          | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.output_max                  | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.output_max       | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.input_max                 | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.input_min             | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.output_max              | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.input_min             | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.linear.weight               | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.output_max       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.o_proj.input_min        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.gate_proj.linear.weight       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.self_attn.q_proj.input_max        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.input_min                   | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.input_max                   | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.input_max             | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.output_max       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.input_max           | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.output_min                | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.linear.weight             | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.input_max        | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.input_layernorm.weight            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_1.output_min       | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.up_proj.output_max            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.norm_post_attn.weight                      | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.v_proj.input_max        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.k_proj.input_min                 | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.pre_feedforward_layernorm.weight  | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward1.ffw_layer_2.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.input_min                 | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.mlp.down_proj.output_max          | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...14}.self_attn.k_proj.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.output_min              | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.linear.weight    | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.output_min            | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_1.input_min        | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.q_proj.linear.weight             | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.norm_out.weight                            | UNEXPECTED |  | 
+model.vision_tower.encoder.layers.{0...15}.post_attention_layernorm.weight   | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.input_min               | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_end.input_max               | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.self_attn.post.output_min                  | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.lconv1d.linear_start.linear.weight         | UNEXPECTED |  | 
+model.embed_vision.embedding_projection.weight                               | UNEXPECTED |  | 
+model.audio_tower.layers.{0...11}.feed_forward2.ffw_layer_2.output_max       | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer1.norm.weight               | UNEXPECTED |  | 
+model.vision_tower.patch_embedder.position_embedding_table                   | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.input_proj_linear.weight         | UNEXPECTED |  | 
+model.embed_audio.embedding_projection.weight                                | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer0.conv.weight               | UNEXPECTED |  | 
+model.audio_tower.output_proj.bias                                           | UNEXPECTED |  | 
+model.vision_tower.patch_embedder.input_proj.weight                          | UNEXPECTED |  | 
+model.audio_tower.subsample_conv_projection.layer1.conv.weight               | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+[gemma4] prompt 18 tokens, decoded 24, rewound to 8: replay exact; edited vs fresh decode 12/12
+.
+[gemma4] prompt 18 tokens, decoded 48, rewound to 37: replay exact; edited vs fresh decode 12/12
+.
+[gemma4] prompt 678 tokens, decoded 24, rewound to 8: replay exact; edited vs fresh decode 12/12
+.
+[gemma4] prompt 678 tokens, decoded 48, rewound to 37: replay exact; edited vs fresh decode 12/12
+.
+[gemma4] prompt 18 tokens, decoded 560, rewound to 37: replay exact; edited vs fresh decode 12/12
+.....
+[symbolic] gate 1: 400 diagnoses, 784 edits; 0 differ. Diagnosis 0.35 ms (DeltaNet) vs 0.011 ms (symbolic)
+.
+[symbolic] gate 2: 400 diagnoses, 800 edits; 0 differ. Diagnosis 0.15 ms vs 0.005 ms
+.
+[symbolic] gate 3: 12 repair rounds, all identical
+.
+[symbolic] dev tasks: 209 repair rounds across 6 regimes; 0 differ
+  contract_smart: 35/35 same edit; diagnosis 2.3 ms (DeltaNet) vs 0.02 ms (symbolic)
+  contract_smart_masked: 24/24 same edit; diagnosis 3.5 ms (DeltaNet) vs 0.02 ms (symbolic)
+  self_smart: 37/37 same edit; diagnosis 2.4 ms (DeltaNet) vs 0.02 ms (symbolic)
+  unpinned_smart: 38/38 same edit; diagnosis 2.8 ms (DeltaNet) vs 0.02 ms (symbolic)
+  local: 37/37 same edit; diagnosis 0.8 ms (DeltaNet) vs 0.02 ms (symbolic)
+  upstream: 38/38 same edit; diagnosis 2.6 ms (DeltaNet) vs 0.02 ms (symbolic)
+.
+[type mask] 300 type-correct documents, 108721 prefixes accepted; fallbacks = free slots
+.
+[type mask] 2228 one-type-error documents: SchemaPrefix accepts, TypeAwareMask rejects
+.
+[type mask] 30064 prefixes of 200 random documents: typed next-character set within SchemaPrefix's
+.
+[type mask] 400 random walks, none reached an empty admissible set; 400 finished, all valid
+.
+[type mask] 56 distinct admitted characters, all single Gemma tokens: True
+.
+[type mask] after '"stock": "16', logits on u32 > usd > u > n: SchemaPrefix decodes 'usd', TypeAwareMask '7'
+[type mask] at a U32 node's ref, logits on the Nat input price: SchemaPrefix decodes 'price', TypeAwareMask 'b'
+.
+53 passed in 1172.64s (0:19:32)

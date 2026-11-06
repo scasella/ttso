@@ -1,0 +1,144 @@
+{
+ "n": 20,
+ "arms": [
+  "greedy_masked",
+  "greedy_typemasked",
+  "best_of_n_typemasked",
+  "ttso_pinned_masked",
+  "ttso_pinned_typemasked"
+ ],
+ "greedy_masked": {
+  "valid": 10,
+  "correct": 6,
+  "faithful": 6,
+  "correct_5": 6,
+  "faithful_5": 6,
+  "faithful_wilson95": [
+   0.1455,
+   0.519
+  ],
+  "faithful_5_wilson95": [
+   0.1455,
+   0.519
+  ],
+  "latency_mean_s": 5.0291
+ },
+ "greedy_typemasked": {
+  "valid": 19,
+  "correct": 8,
+  "faithful": 8,
+  "correct_5": 6,
+  "faithful_5": 6,
+  "faithful_wilson95": [
+   0.2188,
+   0.6134
+  ],
+  "faithful_5_wilson95": [
+   0.1455,
+   0.519
+  ],
+  "latency_mean_s": 5.51865
+ },
+ "best_of_n_typemasked": {
+  "valid": 19,
+  "correct": 8,
+  "faithful": 8,
+  "correct_5": 6,
+  "faithful_5": 6,
+  "faithful_wilson95": [
+   0.2188,
+   0.6134
+  ],
+  "faithful_5_wilson95": [
+   0.1455,
+   0.519
+  ],
+  "tokens_total": 3,
+  "samples": {
+   "tasks_sampled": 1,
+   "total": 1,
+   "complete": 0,
+   "truncated": 1,
+   "capped": 0,
+   "complete_per_sampled_task": 0.0,
+   "truncated_per_sampled_task": 1.0,
+   "tasks_with_no_complete_sample": 1
+  }
+ },
+ "ttso_pinned_masked": {
+  "valid": 15,
+  "correct": 11,
+  "faithful": 11,
+  "correct_5": 11,
+  "faithful_5": 11,
+  "faithful_wilson95": [
+   0.3421,
+   0.7418
+  ],
+  "faithful_5_wilson95": [
+   0.3421,
+   0.7418
+  ],
+  "extra_tokens_total": 1685,
+  "latency_mean_s": 7.915850000000001,
+  "latency_max_s": 15.556,
+  "same_greedy": true,
+  "rewinds": 26,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 26,
+   "same_diagnosis": 26,
+   "same_edit": 26,
+   "deltanet_ms": 3.4966089677674552,
+   "symbolic_ms": 0.01671315672305914,
+   "main": "deltanet"
+  }
+ },
+ "ttso_pinned_typemasked": {
+  "valid": 19,
+  "correct": 8,
+  "faithful": 8,
+  "correct_5": 6,
+  "faithful_5": 6,
+  "faithful_wilson95": [
+   0.2188,
+   0.6134
+  ],
+  "faithful_5_wilson95": [
+   0.1455,
+   0.519
+  ],
+  "extra_tokens_total": 3,
+  "latency_mean_s": 5.5281,
+  "latency_max_s": 11.957,
+  "same_greedy": true,
+  "rewinds": 3,
+  "replayed_tokens": 0,
+  "replayed_per_rewind": 0.0,
+  "shadow": {
+   "rounds": 3,
+   "same_diagnosis": 3,
+   "same_edit": 3,
+   "deltanet_ms": 0.06962466674546401,
+   "symbolic_ms": 0.008444321186592182,
+   "main": "deltanet"
+  }
+ },
+ "peak_mps_allocated_gb": 4.626139648,
+ "peak_rss_gb": 3.444670464,
+ "model": "google/gemma-4-E2B",
+ "revision": "433813a669639fd7eaa83155828e9000ed357d53",
+ "dtype": "bfloat16",
+ "split": "dev",
+ "n_tasks": 20,
+ "wall_s": 269.5,
+ "max_new_tokens": 320,
+ "k_max": 3,
+ "temperature": 0.7,
+ "device_weights_gib": 4.246382236480713,
+ "mapped_gib": 4.375,
+ "prompt": "raw",
+ "torch": "2.15.0",
+ "mps": true
+}

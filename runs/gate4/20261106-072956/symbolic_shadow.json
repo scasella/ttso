@@ -1,0 +1,50 @@
+{
+ "contract_smart": {
+  "rounds": 35,
+  "same_diagnosis": 35,
+  "same_edit": 35,
+  "deltanet_ms": 2.2844226232596805,
+  "symbolic_ms": 0.022932113746979406,
+  "main": "deltanet"
+ },
+ "contract_smart_masked": {
+  "rounds": 24,
+  "same_diagnosis": 24,
+  "same_edit": 24,
+  "deltanet_ms": 3.4610954608069733,
+  "symbolic_ms": 0.022944419470150024,
+  "main": "deltanet"
+ },
+ "self_smart": {
+  "rounds": 37,
+  "same_diagnosis": 37,
+  "same_edit": 37,
+  "deltanet_ms": 2.392871564921193,
+  "symbolic_ms": 0.021475238247296295,
+  "main": "deltanet"
+ },
+ "unpinned_smart": {
+  "rounds": 38,
+  "same_diagnosis": 38,
+  "same_edit": 38,
+  "deltanet_ms": 2.7726776300512843,
+  "symbolic_ms": 0.022690737080809317,
+  "main": "deltanet"
+ },
+ "local": {
+  "rounds": 37,
+  "same_diagnosis": 37,
+  "same_edit": 37,
+  "deltanet_ms": 0.8423152911426449,
+  "symbolic_ms": 0.01950681404638532,
+  "main": "deltanet"
+ },
+ "upstream": {
+  "rounds": 38,
+  "same_diagnosis": 38,
+  "same_edit": 38,
+  "deltanet_ms": 2.585700657953949,
+  "symbolic_ms": 0.02147481274349909,
+  "main": "deltanet"
+ }
+}

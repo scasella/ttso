@@ -1,0 +1,44 @@
+{"i": 0, "tokens": 123, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 0, "tokens": 123, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 1, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 1, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 2, "tokens": 118, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 2, "tokens": 118, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 3, "tokens": 163, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 3, "tokens": 163, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 4, "tokens": 246, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 4, "output": 1}}
+{"i": 4, "tokens": 246, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 4, "output": 1}}
+{"i": 5, "tokens": 99, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 5, "tokens": 99, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 6, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 6, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 7, "tokens": 320, "typed_ok": true, "done": false, "complete": false, "valid": false, "error": "json: JSONDecodeError", "failed_checks": [], "hard": ["json: truncated"], "fallbacks": {"input_type": 0, "out_type": 1, "output": 0}}
+{"i": 7, "tokens": 320, "typed_ok": true, "done": false, "complete": false, "valid": false, "error": "json: JSONDecodeError", "failed_checks": [], "hard": ["json: truncated"], "fallbacks": {"input_type": 0, "out_type": 1, "output": 0}}
+{"i": 7, "tokens": 320, "typed_ok": true, "done": false, "complete": false, "valid": false, "error": "json: JSONDecodeError", "failed_checks": [], "hard": ["json: truncated"], "fallbacks": {"input_type": 0, "out_type": 1, "output": 0}}
+{"i": 7, "tokens": 320, "typed_ok": true, "done": false, "complete": false, "valid": false, "error": "json: JSONDecodeError", "failed_checks": [], "hard": ["json: truncated"], "fallbacks": {"input_type": 0, "out_type": 1, "output": 0}}
+{"i": 7, "tokens": 320, "typed_ok": true, "done": false, "complete": false, "valid": false, "error": "json: JSONDecodeError", "failed_checks": [], "hard": ["json: truncated"], "fallbacks": {"input_type": 0, "out_type": 1, "output": 0}}
+{"i": 7, "tokens": 3, "typed_ok": true, "done": false, "complete": false, "valid": false, "error": "json: JSONDecodeError", "failed_checks": [], "hard": ["json: truncated"], "fallbacks": {"input_type": 0, "out_type": 0, "output": 0}}
+{"i": 8, "tokens": 155, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 8, "tokens": 155, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 9, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 9, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 10, "tokens": 122, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 10, "tokens": 122, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 11, "tokens": 154, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 11, "tokens": 154, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 12, "tokens": 123, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 12, "tokens": 123, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 13, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 13, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 14, "tokens": 121, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 14, "tokens": 121, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 15, "tokens": 163, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 15, "tokens": 163, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 16, "tokens": 121, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 16, "tokens": 121, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 17, "tokens": 118, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 17, "tokens": 118, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 1, "out_type": 1, "output": 1}}
+{"i": 18, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 18, "tokens": 119, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 1, "output": 1}}
+{"i": 19, "tokens": 163, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}
+{"i": 19, "tokens": 163, "typed_ok": true, "done": true, "complete": true, "valid": true, "error": "", "failed_checks": [], "hard": [], "fallbacks": {"input_type": 0, "out_type": 2, "output": 1}}

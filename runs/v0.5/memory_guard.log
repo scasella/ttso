@@ -1,0 +1,4 @@
+2026-11-06T12:17:50Z guard start; pause at pressure>=4 or free<8%, resume at pressure<=2 and free>=15% for 30s; log LOW at warn or free<15%
+2026-11-06T12:18:10Z LOW free=35% pressure=2 swap_used=3883.81M (not paused)
+2026-11-06T12:34:37Z LOW free=31% pressure=2 swap_used=8913.81M (not paused)
+2026-11-06T12:43:40Z LOW free=42% pressure=2 swap_used=7725.50M (not paused)

@@ -430,8 +430,13 @@ _WS, _CH, _UNTIL, _LITERAL, _SEP, _CALLSEP, _BRANCH, _JUMP, _END = range(9)
 _ASCII = tuple(chr(i) for i in range(128))
 
 
-def _program():
+def _program(typed=False):
+    """typed=False: SchemaPrefix's machine. typed=True (v0.5, type_mask.TypeAwareMask): the same
+    instructions in the same places, with the typed slots renamed so the type-aware state can
+    restrict them (input type, node out_type, arg key, ref, converter, convert arg, output) and
+    the two literals tagged "arg" / "call"."""
     P, at = [], {}
+    t = lambda typed_name, plain: typed_name if typed else plain
     emit = P.append
 
     def key(k):
@@ -446,32 +451,32 @@ def _program():
     emit((_WS,)), emit((_CH, "{", None)), key("inputs"), emit((_CH, "[", None))
     at["input"] = len(P)
     emit((_WS,)), emit((_CH, "{", None)), key("id"), name(None, "inputs", "cur")
-    emit((_WS,)), emit((_CH, ",", None)), key("type"), word("types")
+    emit((_WS,)), emit((_CH, ",", None)), key("type"), word(t("in_types", "types"), t("in_type", None))
     emit((_WS,)), emit((_CH, "}", "push_input")), emit((_SEP, ",", "]", "input"))
     emit((_WS,)), emit((_CH, ",", None)), key("nodes"), emit((_CH, "[", None))
     at["node"] = len(P)
     emit((_WS,)), emit((_CH, "{", None)), key("id"), name(None, "decls", "cur")
-    for k, allowed in (("op", "ops"), ("out_type", "types")):
-        emit((_WS,)), emit((_CH, ",", None)), key(k), word(allowed)
+    for k, allowed, act in (("op", "ops", None), ("out_type", t("out_types", "types"), t("out_type", None))):
+        emit((_WS,)), emit((_CH, ",", None)), key(k), word(allowed, act)
     emit((_WS,)), emit((_CH, ",", None)), key("args"), emit((_CH, "[", None))
     at["arg"] = len(P)
-    emit((_WS,)), emit((_CH, "{", None)), emit((_WS,)), word("argkeys", "argk")
+    emit((_WS,)), emit((_CH, "{", None)), emit((_WS,)), word(t("arg_keys", "argkeys"), "argk")
     emit((_WS,)), emit((_CH, ":", None)), emit((_WS,)), emit((_BRANCH, {"ref": "ref", "lit": "lit", "convert": "convert"}))
     at["ref"] = len(P)
-    name("declared"), emit((_JUMP, "arg_end"))
+    name(t("ref_ids", "declared")), emit((_JUMP, "arg_end"))
     at["lit"] = len(P)
-    emit((_LITERAL,)), emit((_JUMP, "arg_end"))
+    emit(t((_LITERAL, "arg"), (_LITERAL,))), emit((_JUMP, "arg_end"))
     at["convert"] = len(P)
-    emit((_CH, '"', None)), emit((_UNTIL, "(", "convert", False, None, None))
-    emit((_UNTIL, ")", "declared", True, None, None)), emit((_CH, '"', None))
+    emit((_CH, '"', None)), emit((_UNTIL, "(", t("converters", "convert"), False, None, t("conv", None)))
+    emit((_UNTIL, ")", t("convert_ids", "declared"), True, None, None)), emit((_CH, '"', None))
     at["arg_end"] = len(P)
     emit((_WS,)), emit((_CH, "}", None)), emit((_SEP, ",", "]", "arg"))
     emit((_WS,)), emit((_CH, "}", "push_node")), emit((_SEP, ",", "]", "node"))
-    emit((_WS,)), emit((_CH, ",", None)), key("output"), name("nodes")
+    emit((_WS,)), emit((_CH, ",", None)), key("output"), name(t("output_ids", "nodes"), None, t("output", None))
     emit((_WS,)), emit((_CH, ",", None)), key("call"), emit((_CH, "{", None))
     at["call"] = len(P)
     emit((_WS,)), name("unbound", None, "bound"), emit((_WS,)), emit((_CH, ":", None)), emit((_WS,))
-    emit((_LITERAL,)), emit((_CALLSEP, "call"))
+    emit(t((_LITERAL, "call"), (_LITERAL,))), emit((_CALLSEP, "call"))
     emit((_WS,)), emit((_CH, "}", None)), emit((_END,))
     resolve = lambda x: at[x] if isinstance(x, str) else x
     out = []
@@ -498,6 +503,7 @@ class SchemaState:
     """
 
     __slots__ = ("pc", "k", "buf", "inputs", "nodes", "bound", "cur", "argk", "_next")
+    _prog = _PROG  # the machine this state runs (type_mask.TypeAwareMask runs _program(typed=True))
 
     def __init__(self, pc=0, k=0, buf="", inputs=(), nodes=(), bound=(), cur=None, argk=None):
         self.pc, self.k, self.buf = pc, k, buf
@@ -506,7 +512,7 @@ class SchemaState:
 
     @property
     def done(self):
-        return _PROG[self.pc][0] == _END
+        return self._prog[self.pc][0] == _END
 
     @property
     def status(self):
@@ -554,7 +560,7 @@ class SchemaState:
 
     def _enter(self):
         """SchemaPrefix._until fails on an empty allowed set even before its first character."""
-        ins = _PROG[self.pc]
+        ins = self._prog[self.pc]
         return not (ins[0] == _UNTIL and ins[2] is not None and not self._src(ins[2]))
 
     def _done_with(self, pc):
@@ -562,8 +568,9 @@ class SchemaState:
         return self._enter()
 
     def _step(self, c):
+        prog = self._prog
         while True:
-            ins = _PROG[self.pc]
+            ins = prog[self.pc]
             op = ins[0]
             if op == _WS:
                 if c == " " or c == "\n":

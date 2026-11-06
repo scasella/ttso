@@ -1,0 +1,27 @@
+{
+ "affected_tasks": {},
+ "n_left_out": 0,
+ "gaps_logged": 518,
+ "latency": {
+  "greedy_masked": {
+   "mean_all_s": 5.0291,
+   "mean_s": 5.0291
+  },
+  "greedy_typemasked": {
+   "mean_all_s": 5.51865,
+   "mean_s": 5.51865
+  },
+  "best_of_n_typemasked": {
+   "mean_all_s": 5.54815,
+   "mean_s": 5.54815
+  },
+  "ttso_pinned_masked": {
+   "mean_all_s": 7.915850000000001,
+   "mean_s": 7.915850000000001
+  },
+  "ttso_pinned_typemasked": {
+   "mean_all_s": 5.5281,
+   "mean_s": 5.5281
+  }
+ }
+}

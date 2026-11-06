@@ -230,18 +230,22 @@ def _mask_s(cart):
     return getattr(cart, "mask_seconds", 0.0)  # time in the forward mask's accept() / candidates()
 
 
-GREEDY_ARMS = ("greedy", "greedy_masked")
+GREEDY_ARMS = ("greedy", "greedy_masked", "greedy_typemasked")
+_MASKED_GREEDY = {"typed": "greedy_typemasked"}  # cartridge.mask_name -> its greedy arm (v0.5)
 _OUTCOME_KEYS = ("valid", "correct", "faithful", "correct_5", "faithful_5", "vectors_passed", "error")
 
 
 def greedy_arm(cart):
-    return "greedy_masked" if getattr(cart, "apply_forward_mask", False) else "greedy"
+    if not getattr(cart, "apply_forward_mask", False):
+        return "greedy"
+    return _MASKED_GREEDY.get(getattr(cart, "mask_name", None), "greedy_masked")
 
 
 def _decode_key(cart):
-    """What constrains a cartridge's greedy decode: the forward mask, and with it the task contract."""
+    """What constrains a cartridge's greedy decode: the forward mask (and which one), and with it the
+    task contract."""
     mask = bool(getattr(cart, "apply_forward_mask", False))
-    return mask, mask and getattr(cart, "pin_inputs", None) is True
+    return mask, mask and getattr(cart, "pin_inputs", None) is True, getattr(cart, "mask_name", None)
 
 
 def run(backend, regimes, tasks, bon=None, k_max=3, max_new_tokens=320, temperature=0.7, log=print,
